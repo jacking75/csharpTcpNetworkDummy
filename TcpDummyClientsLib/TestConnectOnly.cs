@@ -33,9 +33,9 @@ namespace TcpDummyClientsLib
 
                 for (int i = 0; i < dummyCount; ++i)
                 {
-                    await DummyList[i].Connect().ContinueWith(_ =>
-                                            System.Threading.Interlocked.Increment(ref ConnectedCount)
-                                            );
+                    await DummyList[i].Connect();
+
+                    System.Threading.Interlocked.Increment(ref ConnectedCount);
                 }
             }
             catch (Exception ex)
@@ -43,19 +43,19 @@ namespace TcpDummyClientsLib
                 return ex.Message;
             }
 
-            return "OK";
+            return $"접속 완료 OK: {ConnectedCount}";
         }
 
-        public async Task End()
+        public async Task<string> End()
         {
             for (int i = 0; i < DummyList.Count; ++i)
             {
-                await DummyList[i].Close().ContinueWith(_ =>
-                                        System.Threading.Interlocked.Decrement(ref ConnectedCount)
-                                        );
+                await DummyList[i].Close();
+                                        
+                System.Threading.Interlocked.Decrement(ref ConnectedCount);
             }
 
-            await Task.CompletedTask;
+            return $"접속 종료 OK. 현재 접속 중인 수: {ConnectedCount}";
         }
 
         public Int64 CurrentConnectedCount()

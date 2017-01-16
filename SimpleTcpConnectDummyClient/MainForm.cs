@@ -28,10 +28,12 @@ namespace SimpleTcpEchoDummyClient
             dispatcherUITimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherUITimer.Tick += new EventHandler(Update);
             dispatcherUITimer.Interval = new TimeSpan(0, 0, 0, 1);
+            dispatcherUITimer.Start();
 
             dispatcherLogTimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherLogTimer.Tick += new EventHandler(LogPrint);
-            dispatcherLogTimer.Interval = new TimeSpan(0, 0, 0, 1);
+            dispatcherLogTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+            dispatcherLogTimer.Start();
         }
 
         TestConfig GetTestConfig()
@@ -59,11 +61,9 @@ namespace SimpleTcpEchoDummyClient
         // 접속만.... - 접속 하기
         private async void button1_Click(object sender, EventArgs e)
         {
-            dispatcherUITimer.Start();
-
             var config = GetTestConfig();
 
-            var result = await DummyConnectOnly.Start(config.DummyCount, config.RemoteIP, config.RemotePort);
+            var result = await Task.Run(async () => await DummyConnectOnly.Start(config.DummyCount, config.RemoteIP, config.RemotePort));
 
             AddLog(result);
         }
@@ -71,9 +71,9 @@ namespace SimpleTcpEchoDummyClient
         // 접속만.... - 접속 끊기
         private async void button2_Click(object sender, EventArgs e)
         {
-            await DummyConnectOnly.End();
+            var result = await Task.Run(async () => await DummyConnectOnly.End());
 
-            dispatcherUITimer.Stop();
+            AddLog(result);
         }
 
         void Update(object sender, EventArgs e)
@@ -97,7 +97,7 @@ namespace SimpleTcpEchoDummyClient
             {
                 string msg;
 
-                if (logMsgQueue.TryDequeue(out msg))
+                if (logMsgQueue.TryDequeue(out msg) == false)
                 {
                     break;
                 }
@@ -112,7 +112,7 @@ namespace SimpleTcpEchoDummyClient
                 listBoxLog.Items.Add(msg);
                 listBoxLog.SelectedIndex = listBoxLog.Items.Count - 1;
                 
-                if (logWorkCount > 8)
+                if (logWorkCount > 16)
                 {
                     break;
                 }
