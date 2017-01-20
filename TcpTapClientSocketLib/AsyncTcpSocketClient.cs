@@ -542,6 +542,16 @@ namespace TcpTapClientSocketLib
         }
 
         #endregion
+
+        public int SocketId()
+        {
+            if (Connected)
+            {
+                return (int)_tcpClient.Client.Handle;
+            }
+
+            return 0;
+        }
     }
 
     public enum TcpSocketConnectionState

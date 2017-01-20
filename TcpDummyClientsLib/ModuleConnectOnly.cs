@@ -28,7 +28,7 @@ namespace TcpDummyClientsLib
                     var config = new AsyncTcpSocketClientConfiguration();
                     config.FrameBuilder = new FixedLengthFrameBuilder(8);
 
-                    DummyList.Add(new AsyncTcpSocketClient(remoteEP, new SimpleMessageDispatcher(), config));
+                    DummyList.Add(new AsyncTcpSocketClient(remoteEP, new MessageDispatcher.NoneDispatcher(), config));
                 }
 
                 for (int i = 0; i < dummyCount; ++i)
@@ -63,25 +63,6 @@ namespace TcpDummyClientsLib
             return System.Threading.Interlocked.Read(ref ConnectedCount);
         }
 
-        class SimpleMessageDispatcher : IAsyncTcpSocketClientMessageDispatcher
-        {
-            public async Task OnServerConnected(AsyncTcpSocketClient client)
-            {
-                //Console.WriteLine(string.Format("TCP server {0} has connected.", client.RemoteEndPoint));
-                await Task.CompletedTask;
-            }
-
-            public async Task OnServerDataReceived(AsyncTcpSocketClient client, byte[] data, int offset, int count)
-            {
-                //
-                await Task.CompletedTask;
-            }
-
-            public async Task OnServerDisconnected(AsyncTcpSocketClient client)
-            {
-                //Console.WriteLine(string.Format("TCP server {0} has disconnected.", client.RemoteEndPoint));
-                await Task.CompletedTask;
-            }
-        }
+       
     }
 }
