@@ -9,7 +9,7 @@ using TcpTapClientSocketLib;
 
 namespace TcpDummyClientsLib
 {
-    public class TestConnectOnly
+    public class ModuleConnectOnly
     {
         Int64 ConnectedCount = 0;
         List<AsyncTcpSocketClient> DummyList = new List<AsyncTcpSocketClient>();

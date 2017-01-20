@@ -42,12 +42,12 @@
             this.label3 = new System.Windows.Forms.Label();
             this.listBoxLog = new System.Windows.Forms.ListBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.button3 = new System.Windows.Forms.Button();
+            this.textBox5 = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.button4 = new System.Windows.Forms.Button();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.textBox5 = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -194,31 +194,15 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "접속/끊기 반복";
             // 
-            // button4
+            // button3
             // 
-            this.button4.Location = new System.Drawing.Point(186, 18);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(41, 22);
-            this.button4.TabIndex = 2;
-            this.button4.Text = "Start";
-            this.button4.UseVisualStyleBackColor = true;
-            // 
-            // textBox4
-            // 
-            this.textBox4.Location = new System.Drawing.Point(54, 20);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(44, 21);
-            this.textBox4.TabIndex = 6;
-            this.textBox4.Text = "64";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 24);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(45, 12);
-            this.label6.TabIndex = 5;
-            this.label6.Text = "접속 수";
+            this.button3.Location = new System.Drawing.Point(233, 18);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(41, 22);
+            this.button3.TabIndex = 11;
+            this.button3.Text = "Stop";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // textBox5
             // 
@@ -237,14 +221,32 @@
             this.label7.TabIndex = 9;
             this.label7.Text = "반복";
             // 
-            // button3
+            // button4
             // 
-            this.button3.Location = new System.Drawing.Point(233, 18);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(41, 22);
-            this.button3.TabIndex = 11;
-            this.button3.Text = "Stop";
-            this.button3.UseVisualStyleBackColor = true;
+            this.button4.Location = new System.Drawing.Point(186, 18);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(41, 22);
+            this.button4.TabIndex = 2;
+            this.button4.Text = "Start";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // textBox4
+            // 
+            this.textBox4.Location = new System.Drawing.Point(54, 20);
+            this.textBox4.Name = "textBox4";
+            this.textBox4.Size = new System.Drawing.Size(44, 21);
+            this.textBox4.TabIndex = 6;
+            this.textBox4.Text = "64";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(6, 24);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(45, 12);
+            this.label6.TabIndex = 5;
+            this.label6.Text = "접속 수";
             // 
             // MainForm
             // 

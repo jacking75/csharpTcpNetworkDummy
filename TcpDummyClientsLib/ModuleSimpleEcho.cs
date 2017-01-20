@@ -12,7 +12,7 @@ using TcpTapClientSocketLib;
 
 namespace TcpDummyClientsLib
 {
-    public class TestSimpleEcho
+    public class ModuleSimpleEcho
     {
         AsyncTcpSocketClient _client;
 
@@ -95,7 +95,7 @@ namespace TcpDummyClientsLib
                     }
                     catch (Exception ex)
                     {
-                        Logger.Get<TestSimpleEcho>().Error(ex.Message, ex);
+                        Logger.Get<ModuleSimpleEcho>().Error(ex.Message, ex);
                     }
                 }
 
@@ -104,7 +104,7 @@ namespace TcpDummyClientsLib
             }
             catch (Exception ex)
             {
-                Logger.Get<TestSimpleEcho>().Error(ex.Message, ex);
+                Logger.Get<ModuleSimpleEcho>().Error(ex.Message, ex);
             }
         }
     }

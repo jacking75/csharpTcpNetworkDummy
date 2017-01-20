@@ -13,7 +13,7 @@ namespace SimpleTcpEchoDummyClient
 {
     public partial class MainForm : Form
     {
-        TcpDummyClientsLib.TestConnectOnly DummyConnectOnly = new TcpDummyClientsLib.TestConnectOnly();
+        TcpDummyClientsLib.ModuleConnectOnly DummyConnectOnly = new TcpDummyClientsLib.ModuleConnectOnly();
 
         static System.Collections.Concurrent.ConcurrentQueue<string> logMsgQueue = new System.Collections.Concurrent.ConcurrentQueue<string>();
 
@@ -26,12 +26,12 @@ namespace SimpleTcpEchoDummyClient
             InitializeComponent();
 
             dispatcherUITimer = new System.Windows.Threading.DispatcherTimer();
-            dispatcherUITimer.Tick += new EventHandler(Update);
+            dispatcherUITimer.Tick += new EventHandler(UpdateUI);
             dispatcherUITimer.Interval = new TimeSpan(0, 0, 0, 1);
             dispatcherUITimer.Start();
 
             dispatcherLogTimer = new System.Windows.Threading.DispatcherTimer();
-            dispatcherLogTimer.Tick += new EventHandler(LogPrint);
+            dispatcherLogTimer.Tick += new EventHandler(UpdateLogPrint);
             dispatcherLogTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
             dispatcherLogTimer.Start();
         }
@@ -58,6 +58,7 @@ namespace SimpleTcpEchoDummyClient
             logMsgQueue.Enqueue(msg);
         }
 
+        #region 접속만하기
         // 접속만.... - 접속 하기
         private async void button1_Click(object sender, EventArgs e)
         {
@@ -75,8 +76,24 @@ namespace SimpleTcpEchoDummyClient
 
             AddLog(result);
         }
+        #endregion
 
-        void Update(object sender, EventArgs e)
+        #region 접속/끊기 반복
+        // 테스트 시작 - 접속/끊기 반복
+        private void button4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // 테스트 중단 - 접속/끊기 반복
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
+
+
+        void UpdateUI(object sender, EventArgs e)
         {
             try
             {
@@ -88,7 +105,7 @@ namespace SimpleTcpEchoDummyClient
             }
         }
 
-        void LogPrint(object sender, EventArgs e)
+        void UpdateLogPrint(object sender, EventArgs e)
         {
             // 너무 이 작업만 할 수 없으므로 일정 작업 이상을 하면 일단 패스한다.
             int logWorkCount = 0;
@@ -118,5 +135,7 @@ namespace SimpleTcpEchoDummyClient
                 }
             }
         }
+
+        
     }
 }
