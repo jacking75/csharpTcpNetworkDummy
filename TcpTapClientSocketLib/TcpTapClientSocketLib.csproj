@@ -58,6 +58,7 @@
     <Compile Include="Framing\Base\IFrameDecoder.cs" />
     <Compile Include="Framing\Base\IFrameEncoder.cs" />
     <Compile Include="Framing\FixedLengthFrameBuilder.cs" />
+    <Compile Include="Framing\HeadBodyFrameBuilder.cs" />
     <Compile Include="Framing\LengthFieldBasedFrameBuilder.cs" />
     <Compile Include="Framing\LengthPrefixedFrameBuilder.cs" />
     <Compile Include="Framing\LineBasedFrameBuilder.cs" />

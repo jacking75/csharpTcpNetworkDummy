@@ -2,6 +2,7 @@
 
 namespace TcpTapClientSocketLib
 {
+    // 고정된 크기로만 데이터를 보낸다.
     public sealed class FixedLengthFrameBuilder : FrameBuilder
     {
         public FixedLengthFrameBuilder(int fixedFrameLength)

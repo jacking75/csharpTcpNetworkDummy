@@ -2,45 +2,29 @@
 
 namespace TcpTapClientSocketLib
 {
-    // A high-level overview of the framing is given in the following figure. 
-    //  0                   1                   2                   3
-    //  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-    // +-+-------------+-----------------------------------------------+
-    // |M| Payload len |    Extended payload length                    |
-    // |A|     (7)     |             (16/64)                           |
-    // |S|             |   (if payload len==126/127)                   |
-    // |K|             |                                               |
-    // +-+-------------+- - - - - - - - - - - - - - - - - - - - - - - -+
-    // |     Extended payload length continued, if payload len == 127  |
-    // + - - - - - - - + - - - - - - - - - - - - - - - - - - - - - - - +
-    // |               |    Masking-key, if MASK set to 1              |
-    // +---------------+- - - - - - - - - - - - - - - - - - - - - - - -+
-    // |               |          Payload Data                         :
-    // +----------------- - - - - - - - - - - - - - - - - - - - - - - -+
-    // :                     Payload Data continued ...                :
-    // + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
-    // |                     Payload Data continued ...                |
-    // +---------------------------------------------------------------+
-    public sealed class LengthPrefixedFrameBuilder : FrameBuilder
+    // 헤더 4바이트, 이중 2바이트는 Body 크기
+    // Body Data
+
+    public sealed class HeadBodyFrameBuilderBuilder : FrameBuilder
     {
-        public LengthPrefixedFrameBuilder(bool isMasked = false)
-            : this(new LengthPrefixedFrameEncoder(isMasked), new LengthPrefixedFrameDecoder(isMasked))
+        public HeadBodyFrameBuilderBuilder(bool isMasked = false)
+            : this(new HeadBodyFrameEncoder(isMasked), new HeadBodyFrameDecoder(isMasked))
         {
         }
 
-        public LengthPrefixedFrameBuilder(HeadBodyFrameEncoder encoder, LengthPrefixedFrameDecoder decoder)
+        public HeadBodyFrameBuilderBuilder(HeadBodyFrameEncoder encoder, HeadBodyFrameDecoder decoder)
             : base(encoder, decoder)
         {
         }
     }
 
     // Body 데이터 길이 데이터 선택적 크기 + Body 데이터 마스킹 가능
-    public sealed class LengthPrefixedFrameEncoder : IFrameEncoder
+    public sealed class HeadBodyFrameEncoder : IFrameEncoder
     {
         private static readonly Random _rng = new Random(DateTime.UtcNow.Millisecond);
         private static readonly int MaskingKeyLength = 4;
 
-        public LengthPrefixedFrameEncoder(bool isMasked = false)
+        public HeadBodyFrameEncoder(bool isMasked = false)
         {
             IsMasked = isMasked;
         }
@@ -129,11 +113,11 @@ namespace TcpTapClientSocketLib
         }
     }
 
-    public sealed class LengthPrefixedFrameDecoder : IFrameDecoder
+    public sealed class HeadBodyFrameDecoder : IFrameDecoder
     {
         private static readonly int MaskingKeyLength = 4;
 
-        public LengthPrefixedFrameDecoder(bool isMasked = false)
+        public HeadBodyFrameDecoder(bool isMasked = false)
         {
             IsMasked = isMasked;
         }

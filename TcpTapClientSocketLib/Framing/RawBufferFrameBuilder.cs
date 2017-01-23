@@ -15,6 +15,7 @@ namespace TcpTapClientSocketLib
         }
     }
 
+    // 그대로 보낸다
     public sealed class RawBufferFrameEncoder : IFrameEncoder
     {
         public RawBufferFrameEncoder()

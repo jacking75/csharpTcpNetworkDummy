@@ -45,6 +45,7 @@ namespace TcpTapClientSocketLib
         }
     }
 
+    // 널 문자로 데이터 구분
     public sealed class LineBasedFrameBuilder : FrameBuilder
     {
         public LineBasedFrameBuilder()

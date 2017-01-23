@@ -10,6 +10,7 @@ namespace TcpTapClientSocketLib
         EigthBytes = 8,
     }
 
+    // 보낼 데이터 선두에 Body 데이터의 크기가 있다.
     public sealed class LengthFieldBasedFrameBuilder : FrameBuilder
     {
         public LengthFieldBasedFrameBuilder()
