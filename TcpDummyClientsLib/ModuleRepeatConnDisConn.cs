@@ -6,109 +6,112 @@ using System.Net;
 using System.Threading.Tasks;
 
 using TcpTapClientSocketLib;
+using System.Threading;
 
 namespace TcpDummyClientsLib
 {
     class ModuleRepeatConnDisConn
     {
-        Int64 IsStart = 0;
+        Int64 IsStart = (int)Status.STOP;
 
         List<AsyncTcpSocketClient> DummyList = new List<AsyncTcpSocketClient>();
 
 
         // 최대 스레드 수만큼 나누어서 반복 작업을 시키자(그래야 스레드 다 활용할테니
-        public string Start(int dummyCount, int repeatCount, string ip, UInt16 port)
+        public string Start(int dummyCount, int repeatCount, DateTime repeatTime, string ip, UInt16 port)
         {
-            var maxThreadCount = Utils.MinMaxThreadCount().Item2;
-            var 몫과나머지 = Utils.나누기_몫과나머지(maxThreadCount, dummyCount);
-            
             DummyList.Clear();
 
+            var workList = new List<Task<string>>();
             var remoteEP = new IPEndPoint(IPAddress.Parse(ip), port);
 
+            IsStart = (int)Status.PAUSE;
+
+            for (int i = 0; i < dummyCount; ++i)
+            {
+                var config = new AsyncTcpSocketClientConfiguration();
+                config.FrameBuilder = new FixedLengthFrameBuilder(8);
+
+                DummyList.Add(new AsyncTcpSocketClient(remoteEP, new MessageDispatcher.NoneDispatcher(), config));
+
+
+                workList.Add(ReConnect(DummyList[i], repeatCount, repeatTime));
+            }
+
+            IsStart = (int)Status.RUN;
+
+            Task.WaitAll(workList.ToArray());                        
+            
+            return DummyResult(workList);
+        }
+
+        async Task<string> ReConnect(AsyncTcpSocketClient client, int repeatCount, DateTime repeatTime)
+        {
             try
             {
-                for (int i = 0; i < dummyCount; ++i)
+                int workingCount = 0;
+
+                while (true)
                 {
-                    var config = new AsyncTcpSocketClientConfiguration();
-                    config.FrameBuilder = new FixedLengthFrameBuilder(8);
-
-                    DummyList.Add(new AsyncTcpSocketClient(remoteEP, new MessageDispatcher.NoneDispatcher(), config));
-                }
-
-                var workList = new List<Task<string>>();
-
-                if (몫과나머지.Item1 == maxThreadCount)
-                {
-                    for (int i = 0; i < maxThreadCount; ++i)
+                    if (Interlocked.Read(ref IsStart) == (Int64)Status.STOP)
                     {
-                        for (int j = 0; j < 몫과나머지.Item1; ++j)
-                        {
-                            //workList.Add(DummyList[i].Connect() );
-                        }
+                        return "중단";
                     }
 
+                    if (Interlocked.Read(ref IsStart) == (Int64)Status.PAUSE)
+                    {
+                        await Task.Delay(1);
+                    }
+
+                    if (repeatCount != 0 && repeatCount == workingCount)
+                    {
+                        break;
+                    }
+
+                    if (repeatTime >= DateTime.Now)
+                    {
+                        break;
+                    }
+
+                    await client.Connect();
+                    await client.Close();
+
+                    ++workingCount;
                 }
-
-                for (int i = 0; i < 몫과나머지.Item2; ++i)
-                {
-                    //await DummyList[i].Connect();
-                }
-
-                Task.WaitAll(workList.ToArray());
-
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return "에러:" + ex.Message;
             }
 
-            return $"접속 완료 OK: {dummyCount}";
+            return "완료";
         }
 
-        
-        class RepeatConnDisConn
+        string DummyResult(List<Task<string>> workList)
         {
-            Int64 IsStart = 0;
-            List<AsyncTcpSocketClient> DummyList = new List<AsyncTcpSocketClient>();
-            Dictionary<AsyncTcpSocketClient, int> SocketRepeatCount = new Dictionary<AsyncTcpSocketClient, int>();
+            int failCount = 0, successCount = 0;
 
-            public async Task<string> Start(int dummyCount, int wantRepeatCount, IPEndPoint remoteEP)
+            foreach(var ret in workList)
             {
-                int tryRepeatCount = 0;
-                try
+                if(ret.Result.IndexOf("없음", 0) == 0)
                 {
-                    for (int i = 0; i < dummyCount; ++i)
-                    {
-                        var config = new AsyncTcpSocketClientConfiguration();
-                        config.FrameBuilder = new FixedLengthFrameBuilder(8);
-
-                        var socketClient = new AsyncTcpSocketClient(remoteEP, new MessageDispatcher.NoneDispatcher(), config);
-                        DummyList.Add(socketClient);
-
-                        SocketRepeatCount.Add(socketClient, 0);
-                    }
-
-                    for (int i = 0; i < dummyCount; ++i)
-                    {
-                        // 소켓의 반복 횟수가 끝났으면 더 안한다.                        
-                        //++tryRepeatCount;
-                        //if(tryRepeatCount == wantRepeatCount) { break; }
-                        await DummyList[i].Connect();
-                        await DummyList[i].Close();
-
-                        // //SocketRepeatCount을 뒤져서 값을 올린다.
-                    }
-
+                    ++failCount;
                 }
-                catch (Exception ex)
+                else
                 {
-                    return ex.Message;
+                    ++successCount;
                 }
-
-                return $"접속 완료 OK: {dummyCount}";
             }
+
+            return $"접속 완료 OK: 성공 수{successCount}, 실패 수{failCount}";
         }
+        
+        enum Status
+        {
+            STOP = 0,
+            PAUSE = 1,
+            RUN = 2,
+        }      
 
         
     }
