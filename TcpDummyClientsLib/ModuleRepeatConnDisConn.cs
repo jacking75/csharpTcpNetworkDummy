@@ -12,7 +12,7 @@ namespace TcpDummyClientsLib
 {
     class ModuleRepeatConnDisConn
     {
-        Int64 IsStart = (int)Status.STOP;
+        protected Int64 IsStart = (int)Status.STOP;
 
         List<AsyncTcpSocketClient> DummyList = new List<AsyncTcpSocketClient>();
 
@@ -105,8 +105,8 @@ namespace TcpDummyClientsLib
 
             return $"접속 완료 OK: 성공 수{successCount}, 실패 수{failCount}";
         }
-        
-        enum Status
+
+        protected enum Status
         {
             STOP = 0,
             PAUSE = 1,

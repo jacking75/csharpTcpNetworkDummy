@@ -92,6 +92,26 @@ namespace SimpleTcpEchoDummyClient
         }
         #endregion
 
+        #region Test
+        // Test 연결
+        private void button5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // Test 접속 끊기
+        private void button6_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // Test 보내기
+        private void button7_Click(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
+
 
         void UpdateUI(object sender, EventArgs e)
         {
