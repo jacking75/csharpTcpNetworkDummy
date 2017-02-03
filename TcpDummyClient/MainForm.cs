@@ -9,11 +9,12 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
-namespace SimpleTcpEchoDummyClient
+namespace TcpDummyClient
 {
     public partial class MainForm : Form
     {
         TcpDummyClientsLib.ModuleConnectOnly DummyConnectOnly = new TcpDummyClientsLib.ModuleConnectOnly();
+        TestSendReceive DevTestgSendReceive = new TestSendReceive();
 
         static System.Collections.Concurrent.ConcurrentQueue<string> logMsgQueue = new System.Collections.Concurrent.ConcurrentQueue<string>();
 
@@ -34,6 +35,9 @@ namespace SimpleTcpEchoDummyClient
             dispatcherLogTimer.Tick += new EventHandler(UpdateLogPrint);
             dispatcherLogTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
             dispatcherLogTimer.Start();
+
+
+            DevTestgSendReceive.LogFunc = AddLog;
         }
 
         TestConfig GetTestConfig()
@@ -96,19 +100,30 @@ namespace SimpleTcpEchoDummyClient
         // Test 연결
         private void button5_Click(object sender, EventArgs e)
         {
+            var config = GetTestConfig();
 
+            var result = DevTestgSendReceive.Connect(config.RemoteIP, config.RemotePort);
+
+            AddLog(result);
         }
 
         // Test 접속 끊기
         private void button6_Click(object sender, EventArgs e)
         {
+            DevTestgSendReceive.Close();
 
+            AddLog("서버와 접속 끊음");
         }
 
         // Test 보내기
         private void button7_Click(object sender, EventArgs e)
         {
+            if(string.IsNullOrEmpty(textBox6.Text))
+            {
+                return;
+            }
 
+            DevTestgSendReceive.SendData(textBox6.Text);
         }
         #endregion
 

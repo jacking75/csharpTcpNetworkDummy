@@ -1,4 +1,4 @@
-﻿namespace SimpleTcpEchoDummyClient
+﻿namespace TcpDummyClient
 {
     partial class MainForm
     {

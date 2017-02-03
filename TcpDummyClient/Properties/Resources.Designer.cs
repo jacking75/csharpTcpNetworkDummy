@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SimpleTcpEchoDummyClient.Properties {
+namespace TcpDummyClient.Properties {
     using System;
     
     

@@ -28,7 +28,7 @@ namespace TcpTapClientSocketLib
         {
         }
 
-        public LengthPrefixedFrameBuilder(HeadBodyFrameEncoder encoder, LengthPrefixedFrameDecoder decoder)
+        public LengthPrefixedFrameBuilder(LengthPrefixedFrameEncoder encoder, LengthPrefixedFrameDecoder decoder)
             : base(encoder, decoder)
         {
         }

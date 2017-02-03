@@ -303,10 +303,14 @@ namespace TcpTapClientSocketLib
                     {
                         SegmentBufferDeflector.ShiftBuffer(_configuration.BufferManager, consumedLength, ref _receiveBuffer, ref _receiveBufferOffset);
                     }
-                    catch (ArgumentOutOfRangeException) { }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                    }
                 }
             }
-            catch (Exception ex) when (!ShouldThrow(ex)) { }
+            catch (Exception ex) when (!ShouldThrow(ex))
+            {
+            }
             finally
             {
                 await Close();
@@ -538,7 +542,9 @@ namespace TcpTapClientSocketLib
 
                 await _stream.WriteAsync(frameBuffer, frameBufferOffset, frameBufferLength);
             }
-            catch (Exception ex) when (!ShouldThrow(ex)) { }
+            catch (Exception ex) when (!ShouldThrow(ex))
+            {
+            }
         }
 
         #endregion
