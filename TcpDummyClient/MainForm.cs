@@ -14,6 +14,8 @@ namespace TcpDummyClient
     public partial class MainForm : Form
     {
         TcpDummyClientsLib.ModuleConnectOnly DummyConnectOnly = new TcpDummyClientsLib.ModuleConnectOnly();
+        TcpDummyClientsLib.ModuleRepeatConnDisConn DummyRepeatConnDisConn = new TcpDummyClientsLib.ModuleRepeatConnDisConn();
+        TcpDummyClientsLib.ModuleRepeatConnDisConnAndSendData DummyRepeatConnDisConnSend = new TcpDummyClientsLib.ModuleRepeatConnDisConnAndSendData();
         TestSendReceive DevTestgSendReceive = new TestSendReceive();
 
         static System.Collections.Concurrent.ConcurrentQueue<string> logMsgQueue = new System.Collections.Concurrent.ConcurrentQueue<string>();
@@ -40,6 +42,7 @@ namespace TcpDummyClient
             DevTestgSendReceive.LogFunc = AddLog;
         }
 
+        #region 테스트 설정 값
         TestConfig GetTestConfig()
         {
             return new TestConfig
@@ -56,6 +59,33 @@ namespace TcpDummyClient
             public string RemoteIP;
             public UInt16 RemotePort;
         }
+
+
+
+        TestRepeatConnDisConnConfig GetTestRepeatConnDisConnConfig()
+        {
+            return new TestRepeatConnDisConnConfig
+            {
+                DummyCount = textBox4.Text.ToInt32(),
+                RemoteIP = textBoxIP.Text,
+                RemotePort = textBoxPort.Text.ToUInt16(),
+
+                RepeatCount = textBox5.Text.ToInt32(),
+                RepeatTime = DateTime.Now.AddSeconds(textBox2.Text.ToInt32()),
+            };
+        }
+
+        struct TestRepeatConnDisConnConfig
+        {
+            public int DummyCount;
+            public string RemoteIP;
+            public UInt16 RemotePort;
+
+            public int RepeatCount;
+            public DateTime RepeatTime;
+        }
+        #endregion
+
 
         void AddLog(string msg)
         {
@@ -84,13 +114,45 @@ namespace TcpDummyClient
 
         #region 접속/끊기 반복
         // 테스트 시작 - 접속/끊기 반복
-        private void button4_Click(object sender, EventArgs e)
+        private async void button4_Click(object sender, EventArgs e)
+        {
+            var config = GetTestRepeatConnDisConnConfig();
+
+            if (checkBox1.Checked == false)
+            {
+                var result = await Task.Run(async () => await DummyRepeatConnDisConn.Start(config.DummyCount, config.RepeatCount, config.RepeatTime, config.RemoteIP, config.RemotePort));
+                AddLog(result);
+            }
+            else
+            {
+                var result = await Task.Run(async () => await DummyRepeatConnDisConnSend.Start(config.DummyCount, config.RepeatCount, config.RepeatTime, config.RemoteIP, config.RemotePort));
+                AddLog(result);
+            }
+        }
+
+        // 테스트 중단 - 접속/끊기 반복
+        private async void button3_Click(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked == false)
+            {
+                var result = await Task.Run(async () => await DummyRepeatConnDisConn.End());
+                AddLog(result);
+            }
+            else
+            {
+                var result = await Task.Run(async () => await DummyRepeatConnDisConnSend.End());
+                AddLog(result);
+            }
+        }
+        #endregion
+
+        #region 에코 테스트
+        private void button9_Click(object sender, EventArgs e)
         {
 
         }
 
-        // 테스트 중단 - 접속/끊기 반복
-        private void button3_Click(object sender, EventArgs e)
+        private void button8_Click(object sender, EventArgs e)
         {
 
         }

@@ -25,5 +25,14 @@ namespace TcpDummyClientsLib
             int 나머지 = (int)(피제수 % 제수);
             return Tuple.Create(몫, 나머지);
         }
+
+        private static Random random = new Random();
+
+        public static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
     }
 }

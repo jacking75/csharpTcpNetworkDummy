@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace TcpDummyClientsLib
 {
-    class ModuleRepeatConnDisConn
+    public class ModuleRepeatConnDisConn
     {
         protected Int64 IsStart = (int)Status.STOP;
 
@@ -18,7 +18,7 @@ namespace TcpDummyClientsLib
 
 
         // 최대 스레드 수만큼 나누어서 반복 작업을 시키자(그래야 스레드 다 활용할테니
-        public string Start(int dummyCount, int repeatCount, DateTime repeatTime, string ip, UInt16 port)
+        public async Task<string> Start(int dummyCount, int repeatCount, DateTime repeatTime, string ip, UInt16 port)
         {
             DummyList.Clear();
 
@@ -40,9 +40,10 @@ namespace TcpDummyClientsLib
 
             IsStart = (int)Status.RUN;
 
-            Task.WaitAll(workList.ToArray());                        
+            await Task.WhenAll(workList.ToArray());
             
-            return DummyResult(workList);
+            var result = DummyResult(workList);
+            return result;
         }
 
         async Task<string> ReConnect(AsyncTcpSocketClient client, int repeatCount, DateTime repeatTime)
@@ -104,6 +105,16 @@ namespace TcpDummyClientsLib
             }
 
             return $"접속 완료 OK: 성공 수{successCount}, 실패 수{failCount}";
+        }
+
+        public async Task<string> End()
+        {
+            for (int i = 0; i < DummyList.Count; ++i)
+            {
+                await DummyList[i].Close();
+            }
+
+            return "접속 종료 OK";
         }
 
         protected enum Status

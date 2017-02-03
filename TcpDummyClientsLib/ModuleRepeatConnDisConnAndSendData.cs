@@ -12,7 +12,7 @@ namespace TcpDummyClientsLib
 {
     // 아래 항목을 랜던하게 선택하게 한다 
     // 1)데이터 보내고 받기, 2)접속 끊기, 3)데이터 보내고 바로 끊기(서버로 부터 받지 않는다)
-    class ModuleRepeatConnDisConnAndSendData : ModuleRepeatConnDisConn
+    public class ModuleRepeatConnDisConnAndSendData : ModuleRepeatConnDisConn
     {
         async Task<string> ReConnect(AsyncTcpSocketClient client, int repeatCount, DateTime repeatTime)
         {
@@ -74,7 +74,10 @@ namespace TcpDummyClientsLib
                 {
                     case 0:
                         {
-                            //await client.SendAsync(Encoding.UTF8.GetBytes(text));
+                            var data = MakePacket();
+                            await client.SendAsync(data);
+
+                            // 패킷 처리 루틴에서 접속을 끊는다
                         }
                         break;
                     case 1:
@@ -84,7 +87,9 @@ namespace TcpDummyClientsLib
                         break;
                     case 2:
                         {
-                            //await client.SendAsync(Encoding.UTF8.GetBytes(text));
+                            var data = MakePacket();
+                            await client.SendAsync(data);
+
                             await client.Close();
                         }
                         break;
@@ -96,6 +101,28 @@ namespace TcpDummyClientsLib
             }
 
             return null;
+        }
+
+
+        public Random RandDataSize = new Random();
+
+        public byte[] MakePacket()
+        {
+            var length = RandDataSize.Next(32, 512);
+            var text = Utils.RandomString(length);
+
+
+            Int16 packetId = 241;
+            var textLen = (Int16)Encoding.Unicode.GetBytes(text).Length;
+            var bodyLen = (Int16)(textLen + 2);
+
+            var sendData = new byte[4 + 2 + textLen];
+            Buffer.BlockCopy(BitConverter.GetBytes(packetId), 0, sendData, 0, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes(bodyLen), 0, sendData, 2, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes(textLen), 0, sendData, 4, 2);
+            Buffer.BlockCopy(Encoding.Unicode.GetBytes(text), 0, sendData, 6, textLen);
+
+            return sendData;
         }
     }
 }
