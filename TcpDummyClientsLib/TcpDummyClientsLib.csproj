@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DummyConfigs.cs" />
+    <Compile Include="MessageDispatcher\EchoDispatcher.cs" />
     <Compile Include="MessageDispatcher\NoneDispatcher.cs" />
     <Compile Include="ModuleConnectOnly.cs" />
     <Compile Include="ModuleRepeatConnDisConn.cs" />

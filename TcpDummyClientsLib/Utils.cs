@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TcpDummyClientsLib
 {
-    class Utils
+    public class Utils
     {
         static public Tuple<int,int> MinMaxThreadCount()
         {
@@ -33,6 +33,39 @@ namespace TcpDummyClientsLib
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public enum Status
+        {
+            STOP = 0,
+            PAUSE = 1,
+            RUN = 2,
+        }
+
+        public struct PacketData
+        {
+            public Int16 PacketID;
+            public Int16 BodySize;
+            public byte[] BodyData;
+        }
+
+        public static byte[] MakeRandomStringPacket(int minSize=32, int maxSize=512)
+        {
+            var length = random.Next(minSize, maxSize);
+            var text = Utils.RandomString(length);
+
+
+            Int16 packetId = 241;
+            var textLen = (Int16)Encoding.Unicode.GetBytes(text).Length;
+            var bodyLen = (Int16)(textLen + 2);
+
+            var sendData = new byte[4 + 2 + textLen];
+            Buffer.BlockCopy(BitConverter.GetBytes(packetId), 0, sendData, 0, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes(bodyLen), 0, sendData, 2, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes(textLen), 0, sendData, 4, 2);
+            Buffer.BlockCopy(Encoding.Unicode.GetBytes(text), 0, sendData, 6, textLen);
+
+            return sendData;
         }
     }
 }

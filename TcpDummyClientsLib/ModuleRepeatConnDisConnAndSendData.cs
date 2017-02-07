@@ -24,12 +24,12 @@ namespace TcpDummyClientsLib
 
                 while (true)
                 {
-                    if (Interlocked.Read(ref IsStart) == (Int64)Status.STOP)
+                    if (Interlocked.Read(ref IsStart) == (Int64)Utils.Status.STOP)
                     {
                         return "중단";
                     }
 
-                    if (Interlocked.Read(ref IsStart) == (Int64)Status.PAUSE)
+                    if (Interlocked.Read(ref IsStart) == (Int64)Utils.Status.PAUSE)
                     {
                         await Task.Delay(1);
                     }
@@ -74,7 +74,7 @@ namespace TcpDummyClientsLib
                 {
                     case 0:
                         {
-                            var data = MakePacket();
+                            var data = Utils.MakeRandomStringPacket();
                             await client.SendAsync(data);
 
                             // 패킷 처리 루틴에서 접속을 끊는다
@@ -87,7 +87,7 @@ namespace TcpDummyClientsLib
                         break;
                     case 2:
                         {
-                            var data = MakePacket();
+                            var data = Utils.MakeRandomStringPacket();
                             await client.SendAsync(data);
 
                             await client.Close();
@@ -104,25 +104,6 @@ namespace TcpDummyClientsLib
         }
 
 
-        public Random RandDataSize = new Random();
-
-        public byte[] MakePacket()
-        {
-            var length = RandDataSize.Next(32, 512);
-            var text = Utils.RandomString(length);
-
-
-            Int16 packetId = 241;
-            var textLen = (Int16)Encoding.Unicode.GetBytes(text).Length;
-            var bodyLen = (Int16)(textLen + 2);
-
-            var sendData = new byte[4 + 2 + textLen];
-            Buffer.BlockCopy(BitConverter.GetBytes(packetId), 0, sendData, 0, 2);
-            Buffer.BlockCopy(BitConverter.GetBytes(bodyLen), 0, sendData, 2, 2);
-            Buffer.BlockCopy(BitConverter.GetBytes(textLen), 0, sendData, 4, 2);
-            Buffer.BlockCopy(Encoding.Unicode.GetBytes(text), 0, sendData, 6, textLen);
-
-            return sendData;
-        }
+        
     }
 }

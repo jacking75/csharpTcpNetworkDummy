@@ -81,7 +81,7 @@ namespace TcpDummyClient
 
             public async Task OnServerDataReceived(AsyncTcpSocketClient client, byte[] data, int offset, int count)
             {                
-                var packet = new PacketData();
+                var packet = new TcpDummyClientsLib.Utils.PacketData();
                 packet.PacketID = BitConverter.ToInt16(data, offset + 0);
                 packet.BodySize = BitConverter.ToInt16(data, offset + 2);
                 packet.BodyData = new byte[packet.BodySize];
@@ -102,11 +102,6 @@ namespace TcpDummyClient
             }
         }
 
-        struct PacketData
-        {
-            public Int16 PacketID;
-            public Int16 BodySize;
-            public byte[] BodyData;
-        }
+        
     }
 }

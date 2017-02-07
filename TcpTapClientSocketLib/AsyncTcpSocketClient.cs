@@ -160,6 +160,8 @@ namespace TcpTapClientSocketLib
                 this.RemoteEndPoint, this.LocalEndPoint);
         }
 
+        public bool IsEnableEchoSend { get; set; }
+
         #endregion
 
         #region Connect

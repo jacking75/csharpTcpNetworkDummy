@@ -5,139 +5,159 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-using Logrila.Logging;
-
 using TcpTapClientSocketLib;
+using System.Threading;
 
 
 namespace TcpDummyClientsLib
 {
     public class ModuleSimpleEcho
     {
-        AsyncTcpSocketClient _client;
+        protected Int64 IsStart = (int)Status.STOP;
+        
+        List<AsyncTcpSocketClient> DummyList = new List<AsyncTcpSocketClient>();
+                
 
-        public void Init()
+        // 최대 스레드 수만큼 나누어서 반복 작업을 시키자(그래야 스레드 다 활용할테니
+        public async Task<string> Start(TestSimpleEchoConfig testConfig)
         {
+            DummyList.Clear();
 
+            var workList = new List<Task<string>>();
+            var remoteEP = new IPEndPoint(IPAddress.Parse(testConfig.RemoteIP), testConfig.RemotePort);
+
+            IsStart = (int)Status.PAUSE;
+
+            for (int i = 0; i < testConfig.DummyCount; ++i)
+            {
+                var config = new AsyncTcpSocketClientConfiguration();
+                config.FrameBuilder = new HeadBodyFrameBuilderBuilder();
+
+                var msgDisp = new MessageDispatcher.EchoDispatcher();
+                msgDisp.LogFunc = testConfig.LogFunc;
+
+                var client = new AsyncTcpSocketClient(remoteEP, msgDisp, config);
+                client.Connect().Wait();
+                client.IsEnableEchoSend = true;
+
+                workList.Add(Echo(client, testConfig.RepeatCount, testConfig.RepeatTime));
+
+                DummyList.Add(client);
+            }
+
+            IsStart = (int)Status.RUN;
+
+            await Task.WhenAll(workList.ToArray());
+
+            var result = DummyResult(workList);
+            return result;
         }
 
-        public void Start()
+        async Task<string> Echo(AsyncTcpSocketClient client, int repeatCount, DateTime repeatTime)
         {
             try
             {
-                var config = new AsyncTcpSocketClientConfiguration();
-                //config.UseSsl = true;
-                //config.SslTargetHost = "Cowboy";
-                //config.SslClientCertificates.Add(new System.Security.Cryptography.X509Certificates.X509Certificate2(@"D:\\Cowboy.cer"));
-                //config.SslPolicyErrorsBypassed = false;
+                int workingCount = 0;
 
-                //config.FrameBuilder = new FixedLengthFrameBuilder(20000);
-                //config.FrameBuilder = new RawBufferFrameBuilder();
-                //config.FrameBuilder = new LineBasedFrameBuilder();
-                //config.FrameBuilder = new LengthPrefixedFrameBuilder();
-                //config.FrameBuilder = new LengthFieldBasedFrameBuilder();
-
-                IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 22222);
-                _client = new AsyncTcpSocketClient(remoteEP, new SimpleMessageDispatcher(), config);
-                _client.Connect().Wait();
-
-                //Console.WriteLine("TCP client has connected to server [{0}].", remoteEP);
-                //Console.WriteLine("Type something to send to server...");
-                /*while (true)
+                while (true)
                 {
-                    try
+                    if (Interlocked.Read(ref IsStart) == (Int64)Status.STOP)
                     {
-                        //string text = Console.ReadLine();
-                        //if (text == "quit")
-                        //    break;
-                        Task.Run(async () =>
-                        {
-                            if (text == "many")
-                            {
-                                text = new string('x', 8192);
-                                for (int i = 0; i < 1000000; i++)
-                                {
-                                    await _client.SendAsync(Encoding.UTF8.GetBytes(text));
-                                    Console.WriteLine("Client [{0}] send text -> [{1}].", _client.LocalEndPoint, text);
-                                }
-                            }
-
-                            else if (text == "big1")
-                            {
-                                text = new string('x', 1024 * 1024 * 1);
-                                await _client.SendAsync(Encoding.UTF8.GetBytes(text));
-                                Console.WriteLine("Client [{0}] send text -> [{1} Bytes].", _client.LocalEndPoint, text.Length);
-                            }
-                            else if (text == "big10")
-                            {
-                                text = new string('x', 1024 * 1024 * 10);
-                                await _client.SendAsync(Encoding.UTF8.GetBytes(text));
-                                Console.WriteLine("Client [{0}] send text -> [{1} Bytes].", _client.LocalEndPoint, text.Length);
-                            }
-                            else if (text == "big100")
-                            {
-                                text = new string('x', 1024 * 1024 * 100);
-                                await _client.SendAsync(Encoding.UTF8.GetBytes(text));
-                                Console.WriteLine("Client [{0}] send text -> [{1} Bytes].", _client.LocalEndPoint, text.Length);
-                            }
-                            else if (text == "big1000")
-                            {
-                                text = new string('x', 1024 * 1024 * 1000);
-                                await _client.SendAsync(Encoding.UTF8.GetBytes(text));
-                                Console.WriteLine("Client [{0}] send text -> [{1} Bytes].", _client.LocalEndPoint, text.Length);
-                            }
-                            else
-                            {
-                                await _client.SendAsync(Encoding.UTF8.GetBytes(text));
-                                Console.WriteLine("Client [{0}] send text -> [{1} Bytes].", _client.LocalEndPoint, text.Length);
-                            }
-                        });
+                        return "중단";
                     }
-                    catch (Exception ex)
+
+                    if (Interlocked.Read(ref IsStart) == (Int64)Status.PAUSE)
                     {
-                        Logger.Get<ModuleSimpleEcho>().Error(ex.Message, ex);
+                        await Task.Delay(1);
                     }
-                }*/
 
-                //_client.Close().Wait();
-                //Console.WriteLine("TCP client has disconnected from server [{0}].", remoteEP);
+                    if (repeatCount != 0 && repeatCount == workingCount)
+                    {
+                        break;
+                    }
+
+                    if (repeatTime >= DateTime.Now)
+                    {
+                        break;
+                    }
+
+                    if (client.IsEnableEchoSend)
+                    {
+                        client.IsEnableEchoSend = false;
+
+                        var data = MakePacket();
+                        await client.SendAsync(data);
+
+                        ++workingCount;
+                    }
+                }
             }
             catch (Exception ex)
             {
-                Logger.Get<ModuleSimpleEcho>().Error(ex.Message, ex);
+                return "에러:" + ex.Message;
             }
+
+            return "완료";
+        }
+
+        string DummyResult(List<Task<string>> workList)
+        {
+            int failCount = 0, successCount = 0;
+
+            foreach (var ret in workList)
+            {
+                if (ret.Result.IndexOf("없음", 0) == 0)
+                {
+                    ++failCount;
+                }
+                else
+                {
+                    ++successCount;
+                }
+            }
+
+            return $"접속 완료 OK: 성공 수{successCount}, 실패 수{failCount}";
+        }
+
+        public async Task<string> End()
+        {
+            for (int i = 0; i < DummyList.Count; ++i)
+            {
+                await DummyList[i].Close();
+            }
+
+            return "접속 종료 OK";
+        }
+        
+        protected enum Status
+        {
+            STOP = 0,
+            PAUSE = 1,
+            RUN = 2,
+        }
+
+
+        public Random RandDataSize = new Random();
+
+        public byte[] MakePacket()
+        {
+            var length = RandDataSize.Next(32, 512);
+            var text = Utils.RandomString(length);
+
+
+            Int16 packetId = 241;
+            var textLen = (Int16)Encoding.Unicode.GetBytes(text).Length;
+            var bodyLen = (Int16)(textLen + 2);
+
+            var sendData = new byte[4 + 2 + textLen];
+            Buffer.BlockCopy(BitConverter.GetBytes(packetId), 0, sendData, 0, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes(bodyLen), 0, sendData, 2, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes(textLen), 0, sendData, 4, 2);
+            Buffer.BlockCopy(Encoding.Unicode.GetBytes(text), 0, sendData, 6, textLen);
+
+            return sendData;
         }
     }
 
 
-    class SimpleMessageDispatcher : IAsyncTcpSocketClientMessageDispatcher
-    {
-        public async Task OnServerConnected(AsyncTcpSocketClient client)
-        {
-            Console.WriteLine(string.Format("TCP server {0} has connected.", client.RemoteEndPoint));
-            await Task.CompletedTask;
-        }
-
-        public async Task OnServerDataReceived(AsyncTcpSocketClient client, byte[] data, int offset, int count)
-        {
-            var text = Encoding.UTF8.GetString(data, offset, count);
-            Console.Write(string.Format("Server : {0} --> ", client.RemoteEndPoint));
-            if (count < 1024 * 1024 * 1)
-            {
-                Console.WriteLine(text);
-            }
-            else
-            {
-                Console.WriteLine("{0} Bytes", count);
-            }
-
-            await Task.CompletedTask;
-        }
-
-        public async Task OnServerDisconnected(AsyncTcpSocketClient client)
-        {
-            Console.WriteLine(string.Format("TCP server {0} has disconnected.", client.RemoteEndPoint));
-            await Task.CompletedTask;
-        }
-    }
 }

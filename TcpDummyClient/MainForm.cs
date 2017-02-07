@@ -13,12 +13,14 @@ namespace TcpDummyClient
 {
     public partial class MainForm : Form
     {
-        TcpDummyClientsLib.ModuleConnectOnly DummyConnectOnly = new TcpDummyClientsLib.ModuleConnectOnly();
-        TcpDummyClientsLib.ModuleRepeatConnDisConn DummyRepeatConnDisConn = new TcpDummyClientsLib.ModuleRepeatConnDisConn();
-        TcpDummyClientsLib.ModuleRepeatConnDisConnAndSendData DummyRepeatConnDisConnSend = new TcpDummyClientsLib.ModuleRepeatConnDisConnAndSendData();
-        TestSendReceive DevTestgSendReceive = new TestSendReceive();
+        TcpDummyClientsLib.ModuleConnectOnly DummyConnectOnly;
+        TcpDummyClientsLib.ModuleRepeatConnDisConn DummyRepeatConnDisConn;
+        TcpDummyClientsLib.ModuleRepeatConnDisConnAndSendData DummyRepeatConnDisConnSend;
+        TcpDummyClientsLib.ModuleSimpleEcho DummySimpleEcho;
 
-        static System.Collections.Concurrent.ConcurrentQueue<string> logMsgQueue = new System.Collections.Concurrent.ConcurrentQueue<string>();
+        TestSendReceive DevTestgSendReceive;
+
+        System.Collections.Concurrent.ConcurrentQueue<string> logMsgQueue;
 
         System.Windows.Threading.DispatcherTimer dispatcherUITimer;
         System.Windows.Threading.DispatcherTimer dispatcherLogTimer;
@@ -27,6 +29,26 @@ namespace TcpDummyClient
         public MainForm()
         {
             InitializeComponent();
+            
+            Init();
+        }
+
+        void Init()
+        {
+            DummyConnectOnly = new TcpDummyClientsLib.ModuleConnectOnly();
+
+            DummyRepeatConnDisConn = new TcpDummyClientsLib.ModuleRepeatConnDisConn();
+
+            DummyRepeatConnDisConnSend = new TcpDummyClientsLib.ModuleRepeatConnDisConnAndSendData();
+
+            DummySimpleEcho = new TcpDummyClientsLib.ModuleSimpleEcho();
+            
+            DevTestgSendReceive = new TestSendReceive();
+            DevTestgSendReceive.LogFunc = AddLog;
+
+
+            logMsgQueue = new System.Collections.Concurrent.ConcurrentQueue<string>();
+
 
             dispatcherUITimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherUITimer.Tick += new EventHandler(UpdateUI);
@@ -37,15 +59,18 @@ namespace TcpDummyClient
             dispatcherLogTimer.Tick += new EventHandler(UpdateLogPrint);
             dispatcherLogTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
             dispatcherLogTimer.Start();
-
-
-            DevTestgSendReceive.LogFunc = AddLog;
         }
 
-        #region 테스트 설정 값
-        TestConfig GetTestConfig()
+        void AddLog(string msg)
         {
-            return new TestConfig
+            logMsgQueue.Enqueue(msg);
+        }
+
+
+        #region 테스트 설정 값
+        TcpDummyClientsLib.TestConfig GetTestConfig()
+        {
+            return new TcpDummyClientsLib.TestConfig
             {
                 DummyCount = textBox3.Text.ToInt32(),
                 RemoteIP = textBoxIP.Text,
@@ -53,18 +78,9 @@ namespace TcpDummyClient
             };
         }
 
-        struct TestConfig
+        TcpDummyClientsLib.TestRepeatConnDisConnConfig GetTestRepeatConnDisConnConfig()
         {
-            public int DummyCount;
-            public string RemoteIP;
-            public UInt16 RemotePort;
-        }
-
-
-
-        TestRepeatConnDisConnConfig GetTestRepeatConnDisConnConfig()
-        {
-            return new TestRepeatConnDisConnConfig
+            return new TcpDummyClientsLib.TestRepeatConnDisConnConfig
             {
                 DummyCount = textBox4.Text.ToInt32(),
                 RemoteIP = textBoxIP.Text,
@@ -74,23 +90,26 @@ namespace TcpDummyClient
                 RepeatTime = DateTime.Now.AddSeconds(textBox2.Text.ToInt32()),
             };
         }
-
-        struct TestRepeatConnDisConnConfig
+                
+        TcpDummyClientsLib.TestSimpleEchoConfig GetTestTestSimpleEchoConfig()
         {
-            public int DummyCount;
-            public string RemoteIP;
-            public UInt16 RemotePort;
+            return new TcpDummyClientsLib.TestSimpleEchoConfig
+            {
+                DummyCount = textBox9.Text.ToInt32(),
+                RemoteIP = textBoxIP.Text,
+                RemotePort = textBoxPort.Text.ToUInt16(),
 
-            public int RepeatCount;
-            public DateTime RepeatTime;
-        }
+                RepeatCount = textBox8.Text.ToInt32(),
+                RepeatTime = DateTime.Now.AddSeconds(textBox7.Text.ToInt32()),
+
+                MinSendDataSize = textBox10.Text.ToInt32(),
+                MaxSendDataSize = textBox11.Text.ToInt32(),
+
+                LogFunc = AddLog,
+            };
+        }        
         #endregion
-
-
-        void AddLog(string msg)
-        {
-            logMsgQueue.Enqueue(msg);
-        }
+        
 
         #region 접속만하기
         // 접속만.... - 접속 하기
@@ -146,17 +165,24 @@ namespace TcpDummyClient
         }
         #endregion
 
-        #region 에코 테스트
-        private void button9_Click(object sender, EventArgs e)
-        {
 
+        #region 에코 테스트
+        private async void button9_Click(object sender, EventArgs e)
+        {
+            var config = GetTestTestSimpleEchoConfig();
+            var result = await Task.Run(async () => await DummySimpleEcho.Start(config));
+
+            AddLog(result);
         }
 
-        private void button8_Click(object sender, EventArgs e)
+        private async void button8_Click(object sender, EventArgs e)
         {
+            var result = await Task.Run(async () => await DummySimpleEcho.End());
 
+            AddLog(result);
         }
         #endregion
+
 
         #region Test
         // Test 연결

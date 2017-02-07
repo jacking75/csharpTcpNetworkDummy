@@ -12,7 +12,7 @@ namespace TcpDummyClientsLib
 {
     public class ModuleRepeatConnDisConn
     {
-        protected Int64 IsStart = (int)Status.STOP;
+        protected Int64 IsStart = (int)Utils.Status.STOP;
 
         List<AsyncTcpSocketClient> DummyList = new List<AsyncTcpSocketClient>();
 
@@ -25,7 +25,7 @@ namespace TcpDummyClientsLib
             var workList = new List<Task<string>>();
             var remoteEP = new IPEndPoint(IPAddress.Parse(ip), port);
 
-            IsStart = (int)Status.PAUSE;
+            IsStart = (int)Utils.Status.PAUSE;
 
             for (int i = 0; i < dummyCount; ++i)
             {
@@ -38,7 +38,7 @@ namespace TcpDummyClientsLib
                 workList.Add(ReConnect(DummyList[i], repeatCount, repeatTime));
             }
 
-            IsStart = (int)Status.RUN;
+            IsStart = (int)Utils.Status.RUN;
 
             await Task.WhenAll(workList.ToArray());
             
@@ -54,12 +54,12 @@ namespace TcpDummyClientsLib
 
                 while (true)
                 {
-                    if (Interlocked.Read(ref IsStart) == (Int64)Status.STOP)
+                    if (Interlocked.Read(ref IsStart) == (Int64)Utils.Status.STOP)
                     {
                         return "중단";
                     }
 
-                    if (Interlocked.Read(ref IsStart) == (Int64)Status.PAUSE)
+                    if (Interlocked.Read(ref IsStart) == (Int64)Utils.Status.PAUSE)
                     {
                         await Task.Delay(1);
                     }
@@ -117,12 +117,7 @@ namespace TcpDummyClientsLib
             return "접속 종료 OK";
         }
 
-        protected enum Status
-        {
-            STOP = 0,
-            PAUSE = 1,
-            RUN = 2,
-        }      
+             
 
         
     }
