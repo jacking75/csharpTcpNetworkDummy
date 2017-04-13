@@ -34,12 +34,12 @@
             this.textBoxIP = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
             this.listBoxLog = new System.Windows.Forms.ListBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -64,7 +64,7 @@
             this.textBoxPort.Name = "textBoxPort";
             this.textBoxPort.Size = new System.Drawing.Size(61, 21);
             this.textBoxPort.TabIndex = 4;
-            this.textBoxPort.Text = "23452";
+            this.textBoxPort.Text = "32452";
             // 
             // label2
             // 
@@ -107,6 +107,24 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "접속만...";
             // 
+            // textBox1
+            // 
+            this.textBox1.Enabled = false;
+            this.textBox1.Location = new System.Drawing.Point(367, 19);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(61, 21);
+            this.textBox1.TabIndex = 8;
+            this.textBox1.Text = "0";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(294, 23);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(73, 12);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "현재 접속 수";
+            // 
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(190, 19);
@@ -143,24 +161,6 @@
             this.label3.Size = new System.Drawing.Size(45, 12);
             this.label3.TabIndex = 5;
             this.label3.Text = "접속 수";
-            // 
-            // textBox1
-            // 
-            this.textBox1.Enabled = false;
-            this.textBox1.Location = new System.Drawing.Point(367, 19);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(61, 21);
-            this.textBox1.TabIndex = 8;
-            this.textBox1.Text = "0";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(294, 23);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(73, 12);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "현재 접속 수";
             // 
             // listBoxLog
             // 

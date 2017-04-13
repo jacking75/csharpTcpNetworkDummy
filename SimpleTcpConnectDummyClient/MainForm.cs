@@ -13,7 +13,7 @@ namespace SimpleTcpEchoDummyClient
 {
     public partial class MainForm : Form
     {
-        TcpDummyClientsLib.TestConnectOnly DummyConnectOnly = new TcpDummyClientsLib.TestConnectOnly();
+        TcpDummyClientsLib.ModuleConnectOnly DummyConnectOnly = new TcpDummyClientsLib.ModuleConnectOnly();
 
         static System.Collections.Concurrent.ConcurrentQueue<string> logMsgQueue = new System.Collections.Concurrent.ConcurrentQueue<string>();
 
