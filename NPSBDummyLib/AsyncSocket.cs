@@ -24,45 +24,38 @@ namespace NPSBDummyLib
             }
         }
 
-        public async Task ReceiveAsync()
+        public async Task<(int, string)> ReceiveAsync(int bufferSize, byte[] buffer)
         {
             try
             {
                 using (var stream = Client.GetStream())
                 {
-                    var bufferSize = 1024;
-                    var buffer = new byte[1024];
                     var length = await stream.ReadAsync(buffer, 0, bufferSize);//.ConfigureAwait(false);
+                    return (length, "");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-            }
-            finally
-            {
-                //Interlocked.Increment(ref CloseCount);
                 Client.Close();
-            }
+                return (-1, ex.Message);
+            }            
         }
 
-        public async Task WriteAsync(int bufferSize, byte[] buffer)
+        public async Task<string> SendAsync(int bufferSize, byte[] buffer)
         {
             try
             {
                 using (var stream = Client.GetStream())
                 {
                     await stream.WriteAsync(buffer, 0, bufferSize);//.ConfigureAwait(false);
+                    return "";
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-            }
-            finally
-            {
                 Client.Close();
-            }
+                return ex.Message;
+            }            
         }
 
         public void Close()
