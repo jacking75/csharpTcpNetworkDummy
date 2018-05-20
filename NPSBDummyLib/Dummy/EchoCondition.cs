@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NPSBDummyLib.Dummys
+namespace NPSBDummyLib.Dummy
 {
     public class EchoCondition
     {

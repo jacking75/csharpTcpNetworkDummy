@@ -8,4 +8,14 @@
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Dummys\**" />
+    <EmbeddedResource Remove="Dummys\**" />
+    <None Remove="Dummys\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Dummy\ConnectOnly.cs" />
+  </ItemGroup>
+
 </Project>

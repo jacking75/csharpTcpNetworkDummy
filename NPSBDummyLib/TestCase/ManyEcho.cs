@@ -8,7 +8,7 @@ namespace NPSBDummyLib.TestCase
     public class ManyEcho
     {
         Int64 ConnectedCount = 0;
-        List<Dummys.Echo> DummyList = new List<Dummys.Echo>();
+        List<Dummy.Echo> DummyList = new List<Dummy.Echo>();
 
         public Action<string> MsgFunc;
 
@@ -16,13 +16,13 @@ namespace NPSBDummyLib.TestCase
         {
             for (int i = 0; i < dummyCount; ++i)
             {
-                DummyList.Add(new Dummys.Echo());
+                DummyList.Add(new Dummy.Echo());
             }
 
             return "";
         }
 
-        public async Task<string> ProcessAsync(Dummys.EchoCondition cond)
+        public async Task<string> ProcessAsync(Dummy.EchoCondition cond)
         {
             ConnectedCount = 0;
 

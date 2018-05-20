@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NPSBDummyLib.Dummys
+namespace NPSBDummyLib.Dummy
 {
     class Echo
     {

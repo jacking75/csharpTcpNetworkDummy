@@ -8,13 +8,13 @@ namespace NPSBDummyLib.TestCase
     public class ManyConnect
     {
         Int64 ConnectedCount = 0;
-        List<Dummys.ConnectOnly> DummyList = new List<Dummys.ConnectOnly>();
+        List<Dummy.Dummy> DummyList = new List<Dummy.Dummy>();
 
         public string Prepare(int dummyCount)
         {
             for (int i = 0; i < dummyCount; ++i)
             {
-                DummyList.Add(new Dummys.ConnectOnly());
+                DummyList.Add(new Dummy.Dummy());
             }
 
             return "";
@@ -28,7 +28,7 @@ namespace NPSBDummyLib.TestCase
             {
                 for (int i = 0; i < DummyList.Count; ++i)
                 {
-                    await Task.Run(async () => await DummyList[i].ProcessAsync(ip, port));
+                    await Task.Run(async () => await DummyList[i].ConnectAsync(ip, port, 10));
 
                     System.Threading.Interlocked.Increment(ref ConnectedCount);
                 }
