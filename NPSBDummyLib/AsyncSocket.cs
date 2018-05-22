@@ -11,16 +11,20 @@ namespace NPSBDummyLib
         TcpClient Client = new TcpClient();
 
 
-        public async Task<string> ConnectAsync(string ip, int port)
+        public bool IsConnected() { return Client.Connected; }
+
+        
+
+        public async Task<(bool,string)> ConnectAsync(string ip, int port)
         {
             try
             {
                 await Client.ConnectAsync(ip, port);
-                return "";
+                return (true, "");
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return (false, ex.ToString());
             }
         }
 

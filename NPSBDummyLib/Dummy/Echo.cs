@@ -14,17 +14,17 @@ namespace NPSBDummyLib.Dummy
 
         public Action<string> MsgFunc; //[진행중] [완료] [실패]
 
-        public async Task<string> ProcessAsync(EchoCondition cond)
+        public async Task<string> EchoAsync(EchoCondition cond)
         {
             SendPacket.Init(cond.PacketSizeMax);
             RecvPacket.Init(cond.PacketSizeMax);
 
             try
             {
-                var result = await ClientSocket.ConnectAsync(cond.IP, cond.Port);
-                if (result != "")
+                var (result, error) = await ClientSocket.ConnectAsync(cond.IP, cond.Port);
+                if (result == false)
                 {
-                    return result;
+                    return error;
                 }
 
                 int curEchoCount = 0;

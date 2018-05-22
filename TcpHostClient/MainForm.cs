@@ -13,10 +13,8 @@ namespace TcpDummyClient
 {
     public partial class MainForm : Form
     {
-        NPSBDummyLib.TestCase.ManyConnect DummyConnectOnly = new NPSBDummyLib.TestCase.ManyConnect();
-
-        //TestSendReceive DevTestgSendReceive = new TestSendReceive();
-
+        NPSBDummyLib.Dummy.DummyManager DummyManager = new NPSBDummyLib.Dummy.DummyManager();
+        
         System.Collections.Concurrent.ConcurrentQueue<string> logMsgQueue;
 
         System.Windows.Threading.DispatcherTimer dispatcherUITimer;
@@ -32,11 +30,10 @@ namespace TcpDummyClient
 
         void Init()
         {
-            //DevTestgSendReceive.LogFunc = AddLog;
-
-
+            DummyManager.LogFunc = AddLog;
+            
             logMsgQueue = new System.Collections.Concurrent.ConcurrentQueue<string>();
-
+            
 
             dispatcherUITimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherUITimer.Tick += new EventHandler(UpdateUI);
@@ -100,19 +97,19 @@ namespace TcpDummyClient
         {
             var config = GetTestConfig();
 
-            DummyConnectOnly.Prepare(config.Item1);
+            //DummyConnectOnly.Prepare(config.Item1);
 
-            var result = await Task.Run(async () => await DummyConnectOnly.ProcessAsync(config.Item2, config.Item3));
+            //var result = await Task.Run(async () => await DummyConnectOnly.ProcessAsync(config.Item2, config.Item3));
 
-            AddLog(result);
+            //AddLog(result);
         }
 
         // 접속만.... - 접속 끊기
         private async void button2_Click(object sender, EventArgs e)
         {
-            var result = await Task.Run(async () => await DummyConnectOnly.EndAsync());
+            //var result = await Task.Run(async () => await DummyConnectOnly.EndAsync());
 
-            AddLog(result);
+            //AddLog(result);
         }
         #endregion
 
@@ -205,7 +202,7 @@ namespace TcpDummyClient
         {
             try
             {
-                textBox1.Text = DummyConnectOnly.CurrentConnectedCount().ToString();
+                //textBox1.Text = DummyConnectOnly.CurrentConnectedCount().ToString();
             }
             catch (Exception ex)
             {

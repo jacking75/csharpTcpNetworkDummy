@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 namespace NPSBDummyLib.TestCase
 {
+    //TODO: 삭제 예정
+    /*
     public class ManyEcho
     {
         Int64 ConnectedCount = 0;
@@ -41,23 +43,7 @@ namespace NPSBDummyLib.TestCase
             }
 
             return $"[Success] 접속 완료: {ConnectedCount}";
-        }
-
-        //public async Task<string> EndAsync()
-        //{
-        //    for (int i = 0; i < DummyList.Count; ++i)
-        //    {
-        //        await Task.Run(async () => await DummyList[i].EndAsync());
-
-        //        System.Threading.Interlocked.Decrement(ref ConnectedCount);
-        //    }
-
-        //    return $"[Success] 현재 접속 중인 수: {ConnectedCount}";
-        //}
-
-        //public Int64 CurrentConnectedCount()
-        //{
-        //    return System.Threading.Interlocked.Read(ref ConnectedCount);
-        //}
+        }               
     }
+    */
 }

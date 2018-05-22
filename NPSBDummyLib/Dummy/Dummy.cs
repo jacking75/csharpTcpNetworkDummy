@@ -7,40 +7,44 @@ namespace NPSBDummyLib.Dummy
 {
     class Dummy
     {
-        AsyncSocket ClientSocket = new AsyncSocket();
+        public AsyncSocket ClientSocket = new AsyncSocket();
 
         SendPacketInfo SendPacket = new SendPacketInfo();
         RecvPacketInfo RecvPacket = new RecvPacketInfo();
 
-        public Action<string> MsgFunc; //[진행중] [완료] [실패]
-        public Action<string> LogFunc; //[진행중] [완료] [실패]
+        public Int64 ConnectCount { get; private set; }
+
+        int ConnecTryCount;
+                        
+
+        public void Connected() { ++ConnectCount;  }
 
 
-        public async Task<bool> ConnectAsync(string ip, int port, int tryCount)
+        public async Task<(bool Result, string Error)> ConnectAsyncAndReTry(string ip, int port)
         {
-            for(int i = 0; i < tryCount; ++i)
+            const int maxTryCount = 8;
+
+            for (int i = 0; i < maxTryCount; ++i)
             {
-                var result = await ClientSocket.ConnectAsync(ip, port);
+                var (result, error) = await ClientSocket.ConnectAsync(ip, port);
 
-                //TODO: result를 로그로 남기도록 한다.
-
-                if (string.IsNullOrEmpty(result))
+                if (result == false)
                 {
-                    return true;
+                    await Task.Delay(64);
                 }
 
-                //동시 접속이 너무 많아서 서버가 받지 못하는 상황일 수 있으니 잠시 대기 후 다시 접속을 시도한다
+                return (result, error);
             }
 
-            return true;
+            return (false, "Fail Connect");
         }
 
+
 #pragma warning disable 1998
-        public async Task EndAsync()
+        public async Task DisConnectAsync()
         {
             ClientSocket.Close();
         }
-#pragma warning restore 1998
-
+#pragma warning restore 1998        
     }
 }

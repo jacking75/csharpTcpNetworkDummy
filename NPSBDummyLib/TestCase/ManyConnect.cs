@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 namespace NPSBDummyLib.TestCase
 {
+    //TODO: 삭제 예정
+    /*
     public class ManyConnect
     {
         Int64 ConnectedCount = 0;
@@ -58,4 +60,5 @@ namespace NPSBDummyLib.TestCase
             return System.Threading.Interlocked.Read(ref ConnectedCount);
         }
     }
+    */
 }
