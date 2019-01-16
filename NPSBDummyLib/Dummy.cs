@@ -14,6 +14,8 @@ namespace NPSBDummyLib
 
         public Int64 ConnectCount { get; private set; }
 
+        public bool IsSuccessd { get; private set; } = false;
+
         //int ConnecTryCount;
                         
 
@@ -37,6 +39,11 @@ namespace NPSBDummyLib
             }
 
             return (false, "Fail Connect");
+        }
+
+        public void SetSuccess(bool isSuccess)
+        {
+            IsSuccessd = isSuccess;
         }
 
 

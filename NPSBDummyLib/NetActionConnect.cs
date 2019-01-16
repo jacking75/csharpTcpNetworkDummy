@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace NPSBDummyLib
 {
-    public class NetActionConnect
+    internal class NetActionConnect
     {
         public static async Task<(bool, string)> ConnectOnlyAsync(Dummy dummy, TestConfig config, Func<bool> isContinue/*int dummyIndex*/)
         {

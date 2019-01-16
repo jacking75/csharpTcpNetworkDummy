@@ -9,7 +9,7 @@ namespace TcpDummyClient
 {
     class TestSendReceive
     {
-        public Action<string> LogFunc;
+        //public Action<string> LogFunc;
 
         /*
         AsyncTcpSocketClient Client = null;        

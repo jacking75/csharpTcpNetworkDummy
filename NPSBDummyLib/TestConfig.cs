@@ -23,13 +23,5 @@ namespace NPSBDummyLib
 
     }
 
-    public enum TestCase
-    {
-        ONLY_CONNECT = 1,
-        REPEAT_CONNECT = 2,
-        ECHO = 3,
-        ECHO_CONNECT_DISCONNECT = 4,
-        ECHO_CONNECT_DISCONNECT_RANDOM = 5,
-        ECHO_CONNECT_DISCONNECT_SERVER = 6,
-    }
+   
 }

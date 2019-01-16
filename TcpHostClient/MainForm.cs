@@ -104,6 +104,7 @@ namespace TcpDummyClient
             };
             DummyManager.Prepare(config);
 
+            await DummyManager.TestConnectOnlyAsync(DateTime.Now.Ticks, NPSBDummyLib.TestCase.ONLY_CONNECT);
             //NPSBDummyLib.D
             //var result = await Task.Run(async () => await DummyConnectOnly.ProcessAsync(config.Item2, config.Item3));
 
@@ -113,8 +114,9 @@ namespace TcpDummyClient
         // 접속만.... - 접속 끊기
         private async void button2_Click(object sender, EventArgs e)
         {
-            //var result = await Task.Run(async () => await DummyConnectOnly.EndAsync());
+            await Task.CompletedTask;
 
+            //var result = await Task.Run(async () => await DummyConnectOnly.EndAsync());
             //AddLog(result);
         }
         #endregion
@@ -123,6 +125,8 @@ namespace TcpDummyClient
         // 테스트 시작 - 접속/끊기 반복
         private async void button4_Click(object sender, EventArgs e)
         {
+            await Task.CompletedTask;
+
             //var config = GetTestRepeatConnDisConnConfig();
 
             if (checkBox1.Checked == false)
@@ -140,6 +144,8 @@ namespace TcpDummyClient
         // 테스트 중단 - 접속/끊기 반복
         private async void button3_Click(object sender, EventArgs e)
         {
+            await Task.CompletedTask;
+
             if (checkBox1.Checked == false)
             {
                 //var result = await Task.Run(async () => await DummyRepeatConnDisConn.End());
@@ -157,6 +163,8 @@ namespace TcpDummyClient
         #region 에코 테스트
         private async void button9_Click(object sender, EventArgs e)
         {
+            await Task.CompletedTask;
+
             //var config = GetTestTestSimpleEchoConfig();
             //var result = await Task.Run(async () => await DummySimpleEcho.Start(config));
 
@@ -165,6 +173,8 @@ namespace TcpDummyClient
 
         private async void button8_Click(object sender, EventArgs e)
         {
+            await Task.CompletedTask;
+
             //var result = await Task.Run(async () => await DummySimpleEcho.End());
 
             //AddLog(result);

@@ -11,6 +11,8 @@ namespace NPSBDummyLib
 
         TestConfig Config = new TestConfig();
 
+        TestResultManager TestResultMgr = new TestResultManager();
+
         bool InProgress;
 
 
@@ -22,8 +24,16 @@ namespace NPSBDummyLib
                 
         public bool Prepare(TestConfig config)
         {
-            InProgress = true;
+            DummyList.Clear();
+
             Config = config;
+
+            for(int i = 0; i < Config.DummyCount; ++i)
+            {
+                DummyList.Add(new Dummy());
+            }
+            InProgress = true;
+            
             return false;
         }
                 
