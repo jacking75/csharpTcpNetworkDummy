@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NPSBDummyLib.Dummy
+namespace NPSBDummyLib
 {
     class Echo
     {
@@ -12,7 +12,7 @@ namespace NPSBDummyLib.Dummy
         SendPacketInfo SendPacket = new SendPacketInfo();
         RecvPacketInfo RecvPacket = new RecvPacketInfo();
 
-        public Action<string> MsgFunc; //[진행중] [완료] [실패]
+        //public Action<string> MsgFunc; //[진행중] [완료] [실패]
 
         public async Task<string> EchoAsync(EchoCondition cond)
         {

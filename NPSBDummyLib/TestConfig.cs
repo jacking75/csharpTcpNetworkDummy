@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NPSBDummyLib.Dummy
+namespace NPSBDummyLib
 {
     public class TestConfig
     {

@@ -13,7 +13,7 @@ namespace TcpDummyClient
 {
     public partial class MainForm : Form
     {
-        NPSBDummyLib.Dummy.DummyManager DummyManager = new NPSBDummyLib.Dummy.DummyManager();
+        NPSBDummyLib.DummyManager DummyManager = new NPSBDummyLib.DummyManager();
         
         System.Collections.Concurrent.ConcurrentQueue<string> logMsgQueue;
 
@@ -54,7 +54,7 @@ namespace TcpDummyClient
         #region 테스트 설정 값
         (int, string, int) GetTestConfig()
         {
-            return (textBox3.Text.ToInt32(), textBoxIP.Text, textBoxPort.Text.ToInt32());
+            return (textBoxConnectCount.Text.ToInt32(), textBoxIP.Text, textBoxPort.Text.ToInt32());
         }
         /*
         TcpDummyClientsLib.TestRepeatConnDisConnConfig GetTestRepeatConnDisConnConfig()
@@ -95,10 +95,16 @@ namespace TcpDummyClient
         // 접속만.... - 접속 하기
         private async void button1_Click(object sender, EventArgs e)
         {
-            var config = GetTestConfig();
+            (var conCount, var ip, var port) = GetTestConfig();
+            var config = new NPSBDummyLib.TestConfig
+            {
+                RmoteIP = ip,
+                RemotePort = port,
+                DummyCount = conCount,
+            };
+            DummyManager.Prepare(config);
 
-            //DummyConnectOnly.Prepare(config.Item1);
-
+            //NPSBDummyLib.D
             //var result = await Task.Run(async () => await DummyConnectOnly.ProcessAsync(config.Item2, config.Item3));
 
             //AddLog(result);

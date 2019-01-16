@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NPSBDummyLib.Dummy
+namespace NPSBDummyLib
 {
     public class Dummy
     {
@@ -14,7 +14,7 @@ namespace NPSBDummyLib.Dummy
 
         public Int64 ConnectCount { get; private set; }
 
-        int ConnecTryCount;
+        //int ConnecTryCount;
                         
 
         public void Connected() { ++ConnectCount;  }
@@ -23,7 +23,7 @@ namespace NPSBDummyLib.Dummy
         public async Task<(bool Result, string Error)> ConnectAsyncAndReTry(string ip, int port)
         {
             const int maxTryCount = 8;
-
+            
             for (int i = 0; i < maxTryCount; ++i)
             {
                 var (result, error) = await ClientSocket.ConnectAsync(ip, port);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NPSBDummyLib.Dummy
+namespace NPSBDummyLib
 {
     public partial class DummyManager
     {
@@ -22,15 +22,11 @@ namespace NPSBDummyLib.Dummy
                 
         public bool Prepare(TestConfig config)
         {
+            InProgress = true;
             Config = config;
             return false;
         }
-        
-        public void StartTest()
-        {
-            InProgress = true;
-        }
-
+                
         public void EndTest()
         {
             InProgress = false;
