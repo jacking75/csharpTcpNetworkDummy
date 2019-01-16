@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace NPSBDummyLib.Dummy
 {
-    class Dummy
+    public class Dummy
     {
         public AsyncSocket ClientSocket = new AsyncSocket();
 

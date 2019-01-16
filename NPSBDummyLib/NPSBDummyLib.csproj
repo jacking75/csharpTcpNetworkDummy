@@ -10,12 +10,16 @@
 
   <ItemGroup>
     <Compile Remove="Dummys\**" />
+    <Compile Remove="TestCase\**" />
     <EmbeddedResource Remove="Dummys\**" />
+    <EmbeddedResource Remove="TestCase\**" />
     <None Remove="Dummys\**" />
+    <None Remove="TestCase\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Dummy\ConnectOnly.cs" />
+    <Compile Remove="Dummy\RepeatConnect.cs" />
   </ItemGroup>
 
 </Project>
