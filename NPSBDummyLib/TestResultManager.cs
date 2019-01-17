@@ -26,8 +26,40 @@ namespace NPSBDummyLib
                     ++report.FailCount;
                 }
             }
+
+            ResultDic.Add(index, report);
         }
-    }
+
+        public List<string> WriteTestResult(Int64 index, TestConfig testConfig)
+        {
+            var resultStringList = new List<string>();
+
+            var result = ResultDic.TryGetValue(index, out var report);
+            if (result == false)
+            {
+                return resultStringList;
+            }
+                        
+            switch(report.Case)
+            {
+                case TestCase.ONLY_CONNECT:
+                    {
+                        resultStringList.Add($"[TestCase - {report.Case}]");
+                        resultStringList.Add($"DummyCount:{report.DummyCount}, Success:{report.SuccessCount}, Fail:{report.FailCount}");
+                    }
+                    break;
+                case TestCase.REPEAT_CONNECT:
+                    {
+                        resultStringList.Add($"[TestCase - {report.Case}, CondiCount:{testConfig.RepeatConnectCount} or CondiTime:{testConfig.RepeatConnectDateTimeSec} Sec]");
+                        resultStringList.Add($"DummyCount:{report.DummyCount}, Success:{report.SuccessCount}, Fail:{report.FailCount}");
+                    }
+                    break;
+            }
+
+            return resultStringList;
+        }
+
+    } // end Class
 
     public class TestResultReport
     {

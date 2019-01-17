@@ -16,7 +16,7 @@ namespace NPSBDummyLib
 
         public bool IsSuccessd { get; private set; } = false;
 
-        //int ConnecTryCount;
+        string LastExceptionMessage;
                         
 
         public void Connected() { ++ConnectCount;  }
@@ -33,6 +33,7 @@ namespace NPSBDummyLib
                 if (result == false)
                 {
                     await Task.Delay(64);
+                    continue;
                 }
 
                 return (result, error);
@@ -48,9 +49,16 @@ namespace NPSBDummyLib
 
 
 #pragma warning disable 1998
-        public async Task DisConnectAsync()
+        public void DisConnect()
         {
-            ClientSocket.Close();
+            try
+            {
+                ClientSocket.Close();
+            }
+            catch(Exception ex)
+            {
+                LastExceptionMessage = ex.Message;
+            }
         }
 #pragma warning restore 1998        
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NPSBDummyLib
@@ -14,16 +15,27 @@ namespace NPSBDummyLib
         TestResultManager TestResultMgr = new TestResultManager();
 
         bool InProgress;
-
-
-
-        //public Action<string> MsgFunc; //[진행중] [완료] [실패]
-
+                
         public Action<string> LogFunc; //[진행중] [완료] [실패]
 
-                
+
+        static Int64 CurrentConnectingCount = 0;
+        static public Int64 ConnectedDummyCount()
+        {
+            return CurrentConnectingCount;
+        }
+        static public void DummyConnected()
+        {
+            Interlocked.Increment(ref CurrentConnectingCount);
+        }
+        static public void DummyDisConnected()
+        {
+            Interlocked.Decrement(ref CurrentConnectingCount);
+        }
+
         public bool Prepare(TestConfig config)
         {
+            CurrentConnectingCount = 0;
             DummyList.Clear();
 
             Config = config;
@@ -40,12 +52,36 @@ namespace NPSBDummyLib
         public void EndTest()
         {
             InProgress = false;
+
+            Thread.Sleep(2000);
+
+            for (int i = 0; i < Config.DummyCount; ++i)
+            {
+                if(DummyList[i] == null)
+                {
+                    continue;
+                }
+
+                DummyList[i].DisConnect();
+            }
             DummyList.Clear();
+
+            Config.ActionCase = TestCase.NONE;
         }
 
         public bool IsInProgress()
         {
             return InProgress;
+        }
+
+        public List<string> GetTestResult(Int64 testIndex )
+        {
+            return TestResultMgr.WriteTestResult(testIndex, Config);
+        }
+
+        public TestCase CurrentTestCase()
+        {
+            return Config.ActionCase;
         }
 
 

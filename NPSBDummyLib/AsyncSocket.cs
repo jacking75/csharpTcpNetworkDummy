@@ -8,10 +8,10 @@ namespace NPSBDummyLib
 {
     public class AsyncSocket
     {
-        TcpClient Client = new TcpClient();
+        TcpClient Client = null;
+        string LastExceptionMessage;
 
-
-        public bool IsConnected() { return Client.Connected; }
+        public bool IsConnected() { return Client != null && Client.Connected; }
 
         
 
@@ -19,12 +19,17 @@ namespace NPSBDummyLib
         {
             try
             {
+                Client = null;
+                Client = new TcpClient();
+
                 await Client.ConnectAsync(ip, port);
+                DummyManager.DummyConnected();
                 return (true, "");
             }
             catch (Exception ex)
             {
-                return (false, ex.ToString());
+                LastExceptionMessage = ex.Message;
+                return (false, ex.Message);
             }
         }
 
@@ -40,6 +45,7 @@ namespace NPSBDummyLib
             }
             catch (Exception ex)
             {
+                LastExceptionMessage = ex.Message;
                 Client.Close();
                 return (-1, ex.Message);
             }            
@@ -57,6 +63,7 @@ namespace NPSBDummyLib
             }
             catch (Exception ex)
             {
+                LastExceptionMessage = ex.Message;
                 Client.Close();
                 return ex.Message;
             }            
@@ -64,10 +71,18 @@ namespace NPSBDummyLib
 
         public void Close()
         {
-            if (Client.Connected)
+            try
             {
-                Client.Close();
+                Client.Close();                
             }
+            catch(Exception ex)
+            {
+                LastExceptionMessage = ex.Message;
+            }
+            finally
+            {
+                DummyManager.DummyDisConnected();
+            }            
         }
     }
 }

@@ -51,10 +51,19 @@ namespace TcpDummyClient
             logMsgQueue.Enqueue(msg);
         }
 
+        void testResultToUILog(Int64 testIndex)
+        {
+            var testResult = DummyManager.GetTestResult(testIndex);
+            foreach (var result in testResult)
+            {
+                AddLog(result);
+            }
+        }
+
         #region 테스트 설정 값
         (int, string, int) GetTestConfig()
         {
-            return (textBoxConnectCount.Text.ToInt32(), textBoxIP.Text, textBoxPort.Text.ToInt32());
+            return (textBoxDummyCount.Text.ToInt32(), textBoxIP.Text, textBoxPort.Text.ToInt32());
         }
         /*
         TcpDummyClientsLib.TestRepeatConnDisConnConfig GetTestRepeatConnDisConnConfig()
@@ -92,7 +101,7 @@ namespace TcpDummyClient
 
 
         #region 접속만하기
-        // 접속만.... - 접속 하기
+        // 접속만....연결하기
         private async void button1_Click(object sender, EventArgs e)
         {
             (var conCount, var ip, var port) = GetTestConfig();
@@ -101,23 +110,20 @@ namespace TcpDummyClient
                 RmoteIP = ip,
                 RemotePort = port,
                 DummyCount = conCount,
+                ActionCase = NPSBDummyLib.TestCase.ONLY_CONNECT
             };
             DummyManager.Prepare(config);
 
-            await DummyManager.TestConnectOnlyAsync(DateTime.Now.Ticks, NPSBDummyLib.TestCase.ONLY_CONNECT);
-            //NPSBDummyLib.D
-            //var result = await Task.Run(async () => await DummyConnectOnly.ProcessAsync(config.Item2, config.Item3));
+            var testIndex = DateTime.Now.Ticks;
+            await DummyManager.TestConnectOnlyAsync(testIndex);
 
-            //AddLog(result);
+            testResultToUILog(testIndex);                       
         }
-
         // 접속만.... - 접속 끊기
-        private async void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
-            await Task.CompletedTask;
-
-            //var result = await Task.Run(async () => await DummyConnectOnly.EndAsync());
-            //AddLog(result);
+            AddLog($"End - {DummyManager.CurrentTestCase()}");
+            DummyManager.EndTest();            
         }
         #endregion
 
@@ -125,37 +131,39 @@ namespace TcpDummyClient
         // 테스트 시작 - 접속/끊기 반복
         private async void button4_Click(object sender, EventArgs e)
         {
-            await Task.CompletedTask;
+            (var conCount, var ip, var port) = GetTestConfig();
+            var config = new NPSBDummyLib.TestConfig
+            {
+                RmoteIP = ip,
+                RemotePort = port,
+                DummyCount = conCount,
+                RepeatConnectCount = textBox5.Text.ToInt64(),
+                RepeatConnectDateTimeSec = textBox2.Text.ToInt64()
+            };
 
-            //var config = GetTestRepeatConnDisConnConfig();
+            var testIndex = DateTime.Now.Ticks;
 
             if (checkBox1.Checked == false)
             {
-                //var result = await Task.Run(async () => await DummyRepeatConnDisConn.Start(config.DummyCount, config.RepeatCount, config.RepeatTime, config.RemoteIP, config.RemotePort));
-                //AddLog(result);
+                config.ActionCase = NPSBDummyLib.TestCase.REPEAT_CONNECT;
+                DummyManager.Prepare(config);
+                await DummyManager.TestRepeatConnectAsync(testIndex);
             }
             else
             {
                 //var result = await Task.Run(async () => await DummyRepeatConnDisConnSend.Start(config.DummyCount, config.RepeatCount, config.RepeatTime, config.RemoteIP, config.RemotePort));
                 //AddLog(result);
             }
+
+            testResultToUILog(testIndex);
+            AddLog($"End - {DummyManager.CurrentTestCase()}");
+            DummyManager.EndTest();
         }
-
         // 테스트 중단 - 접속/끊기 반복
-        private async void button3_Click(object sender, EventArgs e)
+        private void button3_Click(object sender, EventArgs e)
         {
-            await Task.CompletedTask;
-
-            if (checkBox1.Checked == false)
-            {
-                //var result = await Task.Run(async () => await DummyRepeatConnDisConn.End());
-                //AddLog(result);
-            }
-            else
-            {
-                //var result = await Task.Run(async () => await DummyRepeatConnDisConnSend.End());
-                //AddLog(result);
-            }
+            AddLog($"End - {DummyManager.CurrentTestCase()}");
+            DummyManager.EndTest();
         }
         #endregion
 
@@ -218,7 +226,21 @@ namespace TcpDummyClient
         {
             try
             {
-                //textBox1.Text = DummyConnectOnly.CurrentConnectedCount().ToString();
+                var currentTest = DummyManager.CurrentTestCase();
+
+                switch(currentTest)
+                {
+                    case NPSBDummyLib.TestCase.ONLY_CONNECT:
+                        {
+                            textBox1.Text = NPSBDummyLib.DummyManager.ConnectedDummyCount().ToString();
+                        }
+                        break;
+                    default:
+                        {
+                            textBox1.Text = "0";
+                        }
+                        break;
+                }
             }
             catch (Exception ex)
             {

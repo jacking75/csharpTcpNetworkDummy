@@ -7,11 +7,9 @@ namespace NPSBDummyLib
 {
     internal class NetActionConnect
     {
-        public static async Task<(bool, string)> ConnectOnlyAsync(Dummy dummy, TestConfig config, Func<bool> isContinue/*int dummyIndex*/)
+        public static async Task<(bool, string)> ConnectOnlyAsync(Dummy dummy, TestConfig config, Func<bool> isContinue)
         {
-            //var dummy = DummyList[dummyIndex];
-
-            var result = await Task.Run(async () => await dummy.ConnectAsyncAndReTry(config.RmoteIP, config.RemotePort));
+            var result = await dummy.ConnectAsyncAndReTry(config.RmoteIP, config.RemotePort);
 
             if(result.Result == false)
             {
@@ -22,6 +20,12 @@ namespace NPSBDummyLib
                 dummy.Connected();
             }
             
+            if(config.ActionCase == TestCase.ONLY_CONNECT)
+            {
+                dummy.SetSuccess(true);
+                return (true, "");
+            }
+
                                     
             while (true)
             {
@@ -37,41 +41,35 @@ namespace NPSBDummyLib
         }
 
 
-        public static async Task<(bool,string)> RepeatConnectAsync(Dummy dummy, TestConfig config, Func<bool> isContinue/*int dummyIndex*/)
+        public static async Task<(bool,string)> RepeatConnectAsync(Dummy dummy, TestConfig config, Func<bool> isContinue)
         {
-            //var expectConnectCount = Config.RepeatConnectCount + 1;
-            //var dummy = DummyList[dummyIndex];
-            var expectConnectCount = config.RepeatConnectCount + 1;
+            var expectConnectCount = config.RepeatConnectCount;
+            var expectDateTime = DateTime.Now.AddSeconds(config.RepeatConnectDateTimeSec);
 
-            for (int i = 0; i <= expectConnectCount; ++i)
+            while (isContinue())
             {
-                await Task.Run(async () => await dummy.ConnectAsyncAndReTry(config.RmoteIP, config.RemotePort));
+                var result = await dummy.ConnectAsyncAndReTry(config.RmoteIP, config.RemotePort);
+                if (result.Result == false)
+                {
+                    return (false, result.Error);
+                }
+
+
                 dummy.Connected();
+                dummy.DisConnect();
 
-                if (expectConnectCount != 1)
+                if (expectConnectCount > 0 && expectConnectCount == dummy.ConnectCount)
                 {
-                    await dummy.DisConnectAsync();
+                    dummy.SetSuccess(true);
+                    break;
                 } 
-                else
+                else if(expectConnectCount == 0 && expectDateTime <= DateTime.Now)
                 {
-                    //TODO:결과를 통보한다
+                    dummy.SetSuccess(true);
+                    break;
                 }
             }
-
-            if (dummy.ClientSocket.IsConnected())
-            {
-                while(true)
-                {
-                    await Task.Delay(500);
-                    
-                    //TODO: 종료 통보가 오면 종료한다
-                    if(isContinue() == false)
-                    {
-                        break;
-                    }
-                }
-            }
-
+                        
             return (true, "");
         }
 

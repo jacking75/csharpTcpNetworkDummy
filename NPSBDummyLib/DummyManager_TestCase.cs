@@ -7,6 +7,7 @@ namespace NPSBDummyLib
 {
     public enum TestCase
     {
+        NONE = 0,
         ONLY_CONNECT = 1,
         REPEAT_CONNECT = 2,
         ECHO = 3,
@@ -18,7 +19,7 @@ namespace NPSBDummyLib
 
     public partial class DummyManager
     {
-        public async Task TestConnectOnlyAsync(Int64 index, TestCase testType)
+        public async Task TestConnectOnlyAsync(Int64 index)
         {            
             var testResults = new List<Task<(bool, string)>>();
 
@@ -29,21 +30,11 @@ namespace NPSBDummyLib
             }
 
             await Task.WhenAll(testResults.ToArray());
-
-
-            for (int i = 0; i < DummyList.Count; ++i)
-            {
-                var dummy = DummyList[i];
-                if(dummy.ConnectCount > 0)
-                {
-                    dummy.SetSuccess(true);
-                }
-            }
-
-            TestResultMgr.AddTestResult(index, testType, DummyList);
+                                    
+            TestResultMgr.AddTestResult(index, Config.ActionCase, DummyList);
         }
 
-        public async Task TestRepeatConnectAsync()
+        public async Task TestRepeatConnectAsync(Int64 index)
         {
             var testResults = new List<Task<(bool, string)>>();
 
@@ -54,6 +45,8 @@ namespace NPSBDummyLib
             }
 
             await Task.WhenAll(testResults.ToArray());
+
+            TestResultMgr.AddTestResult(index, Config.ActionCase, DummyList);
         }
     }
 }

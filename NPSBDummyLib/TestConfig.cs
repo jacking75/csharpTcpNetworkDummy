@@ -13,8 +13,9 @@ namespace NPSBDummyLib
 
         public int DummyCount;
 
-        public int RepeatConnectCount; // 지정 값만큼 접속 후 끊기 반복 횟수. 0 이상 가능. 0 이면 접속 후 대기, 
-                      
+        public Int64 RepeatConnectCount; // 지정 값만큼 접속 후 끊기 반복
+        public Int64 RepeatConnectDateTimeSec; // 지정 시간 동안 접속 후 끊기 반복. RepeatConnectCount 이 0일 때만 유효 
+
 
         public bool CheckConfigValue()
         {
