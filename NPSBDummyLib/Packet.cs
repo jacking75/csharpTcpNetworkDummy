@@ -7,7 +7,7 @@ namespace NPSBDummyLib
     public class SendPacketInfo
     {
         Random RandDataSize = new Random();
-        public Int16 PACKET_HEADER_SIZE = 4;
+        public Int16 PACKET_HEADER_SIZE = 5;
 
         public Int16 BufferSize;
         public byte[] BufferData;
@@ -26,8 +26,8 @@ namespace NPSBDummyLib
             var bodySize = (Int16)bodyData.Length;
 
 
-            // 패킷 전체 크기(2), 패킷id(2), Body(padding)
-            Int16 packetId = 241;
+            // 패킷 전체 크기(2), 패킷id(2), 패킷타입(1), Body(padding)
+            Int16 packetId = 101;
 
             BufferSize = (Int16)(PACKET_HEADER_SIZE + bodySize);
             BodySize = bodySize;

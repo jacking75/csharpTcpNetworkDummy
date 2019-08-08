@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace NPSBDummyLib
 {
-    class Echo
+    class ActionEcho
     {
         AsyncSocket ClientSocket = new AsyncSocket();
 
@@ -14,7 +14,7 @@ namespace NPSBDummyLib
 
         //public Action<string> MsgFunc; //[진행중] [완료] [실패]
 
-        public async Task<string> EchoAsync(EchoCondition cond)
+        public async Task<(bool, string)> EchoAsync(EchoCondition cond)
         {
             SendPacket.Init(cond.PacketSizeMax);
             RecvPacket.Init(cond.PacketSizeMax);
@@ -24,25 +24,26 @@ namespace NPSBDummyLib
                 var (result, error) = await ClientSocket.ConnectAsync(cond.IP, cond.Port);
                 if (result == false)
                 {
-                    return error;
+                    return (false, error);
                 }
 
                 int curEchoCount = 0;
 
                 while (true)
                 {
+                    //TODO 스레드 잘 사용하는지 알기 위해 스레드 번호찍기
                     SendPacket.SetData(cond.PacketSizeMin, cond.PacketSizeMax);
                     var sendError = await ClientSocket.SendAsync(SendPacket.BufferSize, SendPacket.BufferData);
                     if (sendError != "")
                     {
-                        return sendError;
+                        return End(false, sendError);
                     }
 
-
+                    //TODO 스레드 잘 사용하는지 알기 위해 스레드 번호찍기
                     var (recvCount, recvError) = await ClientSocket.ReceiveAsync(RecvPacket.BufferSize, RecvPacket.Buffer);
                     if (recvError != "")
                     {
-                        return recvError;
+                        return End(false, recvError);
                     }
 
                     if (recvCount > 0)
@@ -51,13 +52,13 @@ namespace NPSBDummyLib
                     }
                     else if (recvCount == 0)
                     {
-                        return "연결 종료";
+                        return End(false, "연결 종료");
                     }
 
 
                     if (SendPacket.BodyData() != RecvPacket.BodyData())
                     {
-                        return "데이터 틀림";
+                        return End(false, "데이터 틀림");
                     }
 
 
@@ -69,21 +70,21 @@ namespace NPSBDummyLib
                     }
                 }
 
-                return "";
+                return End(true, "");
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return (false, ex.ToString());
             }
         }
 
-#pragma warning disable 1998
-        public async Task<string> EndAsync()
+//#pragma warning disable 1998
+        public (bool,string) End(bool result, string message)
         {
             ClientSocket.Close();
-            return "";
+            return (result, message);
         }
-#pragma warning restore 1998
+//#pragma warning restore 1998
 
 
     }
@@ -97,12 +98,18 @@ namespace NPSBDummyLib
         public int PacketSizeMax;
 
         DateTime EchoTime;
-        int EchoCount;
-
+        int EchoCount = 0;
+                
         public void Set(int echoCount, int echoTiimeSecond)
         {
-            EchoCount = echoCount;
-            EchoTime = DateTime.Now.AddSeconds(echoTiimeSecond);
+            if(echoTiimeSecond == 0)
+            {
+                EchoCount = echoCount;
+            }
+            else
+            {
+                EchoTime = DateTime.Now.AddSeconds(echoTiimeSecond);
+            }
         }
 
         public bool IsEnd(int curEchoCount)

@@ -61,9 +61,25 @@ namespace TcpDummyClient
         }
 
         #region 테스트 설정 값
-        (int, string, int) GetTestConfig()
+        (int, string, int) GetTestBaseConfig()
         {
             return (textBoxDummyCount.Text.ToInt32(), textBoxIP.Text, textBoxPort.Text.ToInt32());
+        }
+
+        NPSBDummyLib.EchoCondition GetTestEchoConfig()
+        {
+            (var conCount, var ip, var port) = GetTestBaseConfig();
+            var repeatCount = textBox8.Text.ToInt32();
+            var repeatTimeSec = textBox7.Text.ToInt32();
+
+            var echoCondi = new NPSBDummyLib.EchoCondition();
+            echoCondi.IP = ip;
+            echoCondi.Port = port;
+            echoCondi.PacketSizeMin = textBox10.Text.ToInt32();
+            echoCondi.PacketSizeMax = textBox11.Text.ToInt32();
+            echoCondi.Set(repeatCount, repeatTimeSec);
+            
+            return echoCondi;
         }
         /*
         TcpDummyClientsLib.TestRepeatConnDisConnConfig GetTestRepeatConnDisConnConfig()
@@ -104,7 +120,7 @@ namespace TcpDummyClient
         // 접속만....연결하기
         private async void button1_Click(object sender, EventArgs e)
         {
-            (var conCount, var ip, var port) = GetTestConfig();
+            (var conCount, var ip, var port) = GetTestBaseConfig();
             var config = new NPSBDummyLib.TestConfig
             {
                 RmoteIP = ip,
@@ -131,7 +147,7 @@ namespace TcpDummyClient
         // 테스트 시작 - 접속/끊기 반복
         private async void button4_Click(object sender, EventArgs e)
         {
-            (var conCount, var ip, var port) = GetTestConfig();
+            (var conCount, var ip, var port) = GetTestBaseConfig();
             var config = new NPSBDummyLib.TestConfig
             {
                 RmoteIP = ip,
@@ -141,21 +157,13 @@ namespace TcpDummyClient
                 RepeatConnectDateTimeSec = textBox2.Text.ToInt64()
             };
 
-            var testIndex = DateTime.Now.Ticks;
+            var testUniqueIndex = DateTime.Now.Ticks;
 
-            if (checkBox1.Checked == false)
-            {
-                config.ActionCase = NPSBDummyLib.TestCase.REPEAT_CONNECT;
-                DummyManager.Prepare(config);
-                await DummyManager.TestRepeatConnectAsync(testIndex);
-            }
-            else
-            {
-                //var result = await Task.Run(async () => await DummyRepeatConnDisConnSend.Start(config.DummyCount, config.RepeatCount, config.RepeatTime, config.RemoteIP, config.RemotePort));
-                //AddLog(result);
-            }
-
-            testResultToUILog(testIndex);
+            config.ActionCase = NPSBDummyLib.TestCase.REPEAT_CONNECT;
+            DummyManager.Prepare(config);
+            await DummyManager.TestRepeatConnectAsync(testUniqueIndex);
+            
+            testResultToUILog(testUniqueIndex);
             AddLog($"End - {DummyManager.CurrentTestCase()}");
             DummyManager.EndTest();
         }
@@ -171,12 +179,21 @@ namespace TcpDummyClient
         #region 에코 테스트
         private async void button9_Click(object sender, EventArgs e)
         {
-            await Task.CompletedTask;
+            (var conCount, var ip, var port) = GetTestBaseConfig();
+            var config = new NPSBDummyLib.TestConfig();
+            config.DummyCount = conCount;
+            config.ActionCase = NPSBDummyLib.TestCase.ECHO;
 
-            //var config = GetTestTestSimpleEchoConfig();
-            //var result = await Task.Run(async () => await DummySimpleEcho.Start(config));
+            DummyManager.Prepare(config);
 
-            //AddLog(result);
+
+            var testUniqueIndex = DateTime.Now.Ticks;
+            var echoCondi = GetTestEchoConfig();            
+            await DummyManager.TestRepeatEchoAsync(testUniqueIndex, echoCondi);
+            
+            testResultToUILog(testUniqueIndex);
+            AddLog($"End - {DummyManager.CurrentTestCase()}");
+            DummyManager.EndTest();
         }
 
         private async void button8_Click(object sender, EventArgs e)

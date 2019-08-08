@@ -8,9 +8,10 @@ namespace NPSBDummyLib
     {
         Dictionary<Int64, TestResultReport> ResultDic = new Dictionary<long, TestResultReport>();
 
-        public void AddTestResult(Int64 index, TestCase testType, List<Dummy> dummyList)
+        public void AddTestResult(Int64 index, TestCase testType, List<Dummy> dummyList, DateTime startTime)
         {
             var report = new TestResultReport();
+            report.StartTime = startTime;
             report.UniqueId = index;
             report.Case = testType;
             report.DummyCount = dummyList.Count;
@@ -39,18 +40,29 @@ namespace NPSBDummyLib
             {
                 return resultStringList;
             }
-                        
-            switch(report.Case)
+
+            var testTime = DateTime.Now - report.StartTime;
+
+            switch (report.Case)
             {
                 case TestCase.ONLY_CONNECT:
                     {
                         resultStringList.Add($"[TestCase - {report.Case}]");
+                        resultStringList.Add($"[Test Time - {testTime.TotalMilliseconds} MillSec]");
                         resultStringList.Add($"DummyCount:{report.DummyCount}, Success:{report.SuccessCount}, Fail:{report.FailCount}");
                     }
                     break;
                 case TestCase.REPEAT_CONNECT:
                     {
                         resultStringList.Add($"[TestCase - {report.Case}, CondiCount:{testConfig.RepeatConnectCount} or CondiTime:{testConfig.RepeatConnectDateTimeSec} Sec]");
+                        resultStringList.Add($"[Test Time - {testTime.TotalMilliseconds} MillSec]");
+                        resultStringList.Add($"DummyCount:{report.DummyCount}, Success:{report.SuccessCount}, Fail:{report.FailCount}");
+                    }
+                    break;
+                case TestCase.ECHO:
+                    {
+                        resultStringList.Add($"[TestCase - {report.Case}]");
+                        resultStringList.Add($"[Test Time - {testTime.TotalMilliseconds} MillSec]");
                         resultStringList.Add($"DummyCount:{report.DummyCount}, Success:{report.SuccessCount}, Fail:{report.FailCount}");
                     }
                     break;
@@ -63,6 +75,7 @@ namespace NPSBDummyLib
 
     public class TestResultReport
     {
+        public DateTime StartTime;
         public Int64 UniqueId;
         public TestCase Case;
         public int DummyCount;

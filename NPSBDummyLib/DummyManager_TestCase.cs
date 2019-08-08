@@ -20,48 +20,54 @@ namespace NPSBDummyLib
     public partial class DummyManager
     {
         public async Task TestConnectOnlyAsync(Int64 testUniqueId)
-        {            
+        {
+            var startTime = DateTime.Now;
             var testResults = new List<Task<(bool, string)>>();
 
             for (int i = 0; i < DummyList.Count; ++i)
             {
                 var dummy = DummyList[i];
-                testResults.Add(Task<(bool, string)>.Run(() => NetActionConnect.ConnectOnlyAsync(dummy, Config, IsInProgress)));
+                testResults.Add(Task<(bool, string)>.Run(() => ActionNetConnect.ConnectOnlyAsync(dummy, Config, IsInProgress)));
             }
 
             await Task.WhenAll(testResults.ToArray());
                                     
-            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList);
+            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList, startTime);
         }
 
         public async Task TestRepeatConnectAsync(Int64 testUniqueId)
         {
+            var startTime = DateTime.Now;
             var testResults = new List<Task<(bool, string)>>();
 
             for (int i = 0; i < DummyList.Count; ++i)
             {
                 var dummy = DummyList[i];
-                testResults.Add(Task<(bool, string)>.Run(() => NetActionConnect.RepeatConnectAsync(dummy, Config, IsInProgress)));
+                testResults.Add(Task<(bool, string)>.Run(() => ActionNetConnect.RepeatConnectAsync(dummy, Config, IsInProgress)));
             }
 
             await Task.WhenAll(testResults.ToArray());
 
-            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList);
+            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList, startTime);
         }
 
-        public async Task TestRepeatEchoAsync(Int64 testUniqueId)
+        public async Task TestRepeatEchoAsync(Int64 testUniqueId, EchoCondition echoCondi)
         {
+            var startTime = DateTime.Now;
             var testResults = new List<Task<(bool, string)>>();
 
             for (int i = 0; i < DummyList.Count; ++i)
             {
                 var dummy = DummyList[i];
-                testResults.Add(Task<(bool, string)>.Run(() => NetActionConnect.RepeatConnectAsync(dummy, Config, IsInProgress)));
+                testResults.Add(Task<(bool, string)>.Run(() => {
+                    var echoAction = new ActionEcho();
+                        return echoAction.EchoAsync(echoCondi);
+                    }));
             }
 
             await Task.WhenAll(testResults.ToArray());
 
-            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList);
+            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList, startTime);
         }
     }
 }

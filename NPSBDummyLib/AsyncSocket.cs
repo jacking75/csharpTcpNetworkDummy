@@ -21,6 +21,7 @@ namespace NPSBDummyLib
             {
                 Client = null;
                 Client = new TcpClient();
+                Client.NoDelay = true;
 
                 await Client.ConnectAsync(ip, port);
                 DummyManager.DummyConnected();
