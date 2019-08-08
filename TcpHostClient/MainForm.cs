@@ -114,10 +114,10 @@ namespace TcpDummyClient
             };
             DummyManager.Prepare(config);
 
-            var testIndex = DateTime.Now.Ticks;
-            await DummyManager.TestConnectOnlyAsync(testIndex);
+            var testUniqueId = DateTime.Now.Ticks;
+            await DummyManager.TestConnectOnlyAsync(testUniqueId);
 
-            testResultToUILog(testIndex);                       
+            testResultToUILog(testUniqueId);                       
         }
         // 접속만.... - 접속 끊기
         private void button2_Click(object sender, EventArgs e)

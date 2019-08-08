@@ -19,7 +19,7 @@ namespace NPSBDummyLib
 
     public partial class DummyManager
     {
-        public async Task TestConnectOnlyAsync(Int64 index)
+        public async Task TestConnectOnlyAsync(Int64 testUniqueId)
         {            
             var testResults = new List<Task<(bool, string)>>();
 
@@ -31,10 +31,10 @@ namespace NPSBDummyLib
 
             await Task.WhenAll(testResults.ToArray());
                                     
-            TestResultMgr.AddTestResult(index, Config.ActionCase, DummyList);
+            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList);
         }
 
-        public async Task TestRepeatConnectAsync(Int64 index)
+        public async Task TestRepeatConnectAsync(Int64 testUniqueId)
         {
             var testResults = new List<Task<(bool, string)>>();
 
@@ -46,7 +46,22 @@ namespace NPSBDummyLib
 
             await Task.WhenAll(testResults.ToArray());
 
-            TestResultMgr.AddTestResult(index, Config.ActionCase, DummyList);
+            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList);
+        }
+
+        public async Task TestRepeatEchoAsync(Int64 testUniqueId)
+        {
+            var testResults = new List<Task<(bool, string)>>();
+
+            for (int i = 0; i < DummyList.Count; ++i)
+            {
+                var dummy = DummyList[i];
+                testResults.Add(Task<(bool, string)>.Run(() => NetActionConnect.RepeatConnectAsync(dummy, Config, IsInProgress)));
+            }
+
+            await Task.WhenAll(testResults.ToArray());
+
+            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList);
         }
     }
 }

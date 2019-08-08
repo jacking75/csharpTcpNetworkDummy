@@ -11,7 +11,7 @@ namespace NPSBDummyLib
         public void AddTestResult(Int64 index, TestCase testType, List<Dummy> dummyList)
         {
             var report = new TestResultReport();
-            report.Index = index;
+            report.UniqueId = index;
             report.Case = testType;
             report.DummyCount = dummyList.Count;
 
@@ -30,11 +30,11 @@ namespace NPSBDummyLib
             ResultDic.Add(index, report);
         }
 
-        public List<string> WriteTestResult(Int64 index, TestConfig testConfig)
+        public List<string> WriteTestResult(Int64 testUniqueId, TestConfig testConfig)
         {
             var resultStringList = new List<string>();
 
-            var result = ResultDic.TryGetValue(index, out var report);
+            var result = ResultDic.TryGetValue(testUniqueId, out var report);
             if (result == false)
             {
                 return resultStringList;
@@ -63,7 +63,7 @@ namespace NPSBDummyLib
 
     public class TestResultReport
     {
-        public Int64 Index;
+        public Int64 UniqueId;
         public TestCase Case;
         public int DummyCount;
         public int SuccessCount;

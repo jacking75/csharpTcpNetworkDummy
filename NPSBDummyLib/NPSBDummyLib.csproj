@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -20,6 +20,7 @@
   <ItemGroup>
     <Compile Remove="Dummy\ConnectOnly.cs" />
     <Compile Remove="Dummy\RepeatConnect.cs" />
+    <Compile Remove="EchoCondition.cs" />
   </ItemGroup>
 
 </Project>
