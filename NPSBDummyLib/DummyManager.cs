@@ -42,7 +42,9 @@ namespace NPSBDummyLib
 
             for(int i = 0; i < Config.DummyCount; ++i)
             {
-                DummyList.Add(new Dummy());
+                var dummy = new Dummy();
+                dummy.Init(i);
+                DummyList.Add(dummy);
             }
             InProgress = true;
             

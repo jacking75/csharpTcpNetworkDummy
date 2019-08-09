@@ -38,11 +38,14 @@ namespace NPSBDummyLib
         {
             try
             {
-                using (var stream = Client.GetStream())
-                {
-                    var length = await stream.ReadAsync(buffer, 0, bufferSize);//.ConfigureAwait(false);
-                    return (length, "");
-                }
+                var stream = Client.GetStream();
+                var length = await stream.ReadAsync(buffer, 0, bufferSize);//.ConfigureAwait(false);
+                return (length, "");
+                //using (var stream = Client.GetStream())
+                //{
+                //    var length = await stream.ReadAsync(buffer, 0, bufferSize);//.ConfigureAwait(false);
+                //    return (length, "");
+                //}
             }
             catch (Exception ex)
             {
@@ -56,11 +59,9 @@ namespace NPSBDummyLib
         {
             try
             {
-                using (var stream = Client.GetStream())
-                {
-                    await stream.WriteAsync(buffer, 0, bufferSize);//.ConfigureAwait(false);
-                    return "";
-                }
+                var stream = Client.GetStream();
+                await stream.WriteAsync(buffer, 0, bufferSize);//.ConfigureAwait(false);
+                return "";
             }
             catch (Exception ex)
             {

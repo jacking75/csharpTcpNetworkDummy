@@ -7,43 +7,49 @@ namespace NPSBDummyLib
 {
     class ActionEcho
     {
-        AsyncSocket ClientSocket = new AsyncSocket();
+        //AsyncSocket ClientSocket = new AsyncSocket();
 
         SendPacketInfo SendPacket = new SendPacketInfo();
         RecvPacketInfo RecvPacket = new RecvPacketInfo();
 
         //public Action<string> MsgFunc; //[진행중] [완료] [실패]
 
-        public async Task<(bool, string)> EchoAsync(EchoCondition cond)
+        public async Task<(bool, string)> EchoAsync(Dummy dummy, EchoCondition cond)
         {
+            var clientSocket = dummy.ClientSocket;
             SendPacket.Init(cond.PacketSizeMax);
             RecvPacket.Init(cond.PacketSizeMax);
 
+            int curEchoCount = 0;
+
             try
             {
-                var (result, error) = await ClientSocket.ConnectAsync(cond.IP, cond.Port);
+                var (result, error) = await clientSocket.ConnectAsync(cond.IP, cond.Port);
                 if (result == false)
                 {
                     return (false, error);
                 }
 
-                int curEchoCount = 0;
-
                 while (true)
                 {
-                    //TODO 스레드 잘 사용하는지 알기 위해 스레드 번호찍기
+                    // 스레드 잘 사용하는지 알기 위해 스레드 번호찍기
+                    Utils.Logger.Debug($"Echo-Send. ClientIndex: {dummy.Index}");
+
                     SendPacket.SetData(cond.PacketSizeMin, cond.PacketSizeMax);
-                    var sendError = await ClientSocket.SendAsync(SendPacket.BufferSize, SendPacket.BufferData);
+                    var sendError = await clientSocket.SendAsync(SendPacket.BufferSize, SendPacket.BufferData);
                     if (sendError != "")
                     {
-                        return End(false, sendError);
+                        return End(dummy, curEchoCount, false, sendError);
                     }
 
-                    //TODO 스레드 잘 사용하는지 알기 위해 스레드 번호찍기
-                    var (recvCount, recvError) = await ClientSocket.ReceiveAsync(RecvPacket.BufferSize, RecvPacket.Buffer);
+
+                    // 스레드 잘 사용하는지 알기 위해 스레드 번호찍기
+                    Utils.Logger.Debug($"Echo-Recv. ClientIndex: {dummy.Index}");
+
+                    var (recvCount, recvError) = await clientSocket.ReceiveAsync(RecvPacket.BufferSize, RecvPacket.Buffer);
                     if (recvError != "")
                     {
-                        return End(false, recvError);
+                        return End(dummy, curEchoCount, false, recvError);
                     }
 
                     if (recvCount > 0)
@@ -52,13 +58,13 @@ namespace NPSBDummyLib
                     }
                     else if (recvCount == 0)
                     {
-                        return End(false, "연결 종료");
+                        return End(dummy, curEchoCount, false, "연결 종료");
                     }
 
 
                     if (SendPacket.BodyData() != RecvPacket.BodyData())
                     {
-                        return End(false, "데이터 틀림");
+                        return End(dummy, curEchoCount, false, "데이터 틀림");
                     }
 
 
@@ -70,7 +76,7 @@ namespace NPSBDummyLib
                     }
                 }
 
-                return End(true, "");
+                return End(dummy, curEchoCount, true, "");
             }
             catch (Exception ex)
             {
@@ -78,15 +84,22 @@ namespace NPSBDummyLib
             }
         }
 
-//#pragma warning disable 1998
-        public (bool,string) End(bool result, string message)
+        public (bool,string) End(Dummy dummy, Int32 actionCount, bool result, string message)
         {
-            ClientSocket.Close();
+            if(result)
+            {
+                dummy.SetSuccess(true);
+            }
+            else
+            {
+                dummy.SetSuccess(false);
+            }
+
+            Utils.Logger.Debug($"EchoTest End. DummyIndex:{dummy.Index}, echoCount:{actionCount}, result:{result}, message:{message}");
+
+            dummy.ClientSocket.Close();
             return (result, message);
         }
-//#pragma warning restore 1998
-
-
     }
 
 
@@ -97,9 +110,9 @@ namespace NPSBDummyLib
         public int PacketSizeMin;
         public int PacketSizeMax;
 
-        DateTime EchoTime;
-        int EchoCount = 0;
-                
+        public DateTime EchoTime { get; private set; }
+        public int EchoCount { get; private set; }
+
         public void Set(int echoCount, int echoTiimeSecond)
         {
             if(echoTiimeSecond == 0)

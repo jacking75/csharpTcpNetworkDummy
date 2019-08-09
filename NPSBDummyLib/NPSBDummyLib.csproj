@@ -23,4 +23,8 @@
     <Compile Remove="EchoCondition.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.5.2" />
+  </ItemGroup>
+
 </Project>

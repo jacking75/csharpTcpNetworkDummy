@@ -161,6 +161,7 @@ namespace TcpDummyClient
 
             config.ActionCase = NPSBDummyLib.TestCase.REPEAT_CONNECT;
             DummyManager.Prepare(config);
+                        
             await DummyManager.TestRepeatConnectAsync(testUniqueIndex);
             
             testResultToUILog(testUniqueIndex);
@@ -188,11 +189,14 @@ namespace TcpDummyClient
 
 
             var testUniqueIndex = DateTime.Now.Ticks;
-            var echoCondi = GetTestEchoConfig();            
+            var echoCondi = GetTestEchoConfig();
+
+            AddLog($"Start - {DummyManager.CurrentTestCase()}, Condi_Count:{echoCondi.EchoCount}, Condi_Time:{echoCondi.EchoTime}");
             await DummyManager.TestRepeatEchoAsync(testUniqueIndex, echoCondi);
             
             testResultToUILog(testUniqueIndex);
             AddLog($"End - {DummyManager.CurrentTestCase()}");
+
             DummyManager.EndTest();
         }
 

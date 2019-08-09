@@ -7,6 +7,8 @@ namespace NPSBDummyLib
 {
     public class Dummy
     {
+        public Int32 Index { get; private set; }
+
         public AsyncSocket ClientSocket = new AsyncSocket();
 
         SendPacketInfo SendPacket = new SendPacketInfo();
@@ -21,6 +23,11 @@ namespace NPSBDummyLib
 
         public void Connected() { ++ConnectCount;  }
 
+
+        public void Init(Int32 index)
+        {
+            Index = index;
+        }
 
         public async Task<(bool Result, string Error)> ConnectAsyncAndReTry(string ip, int port)
         {

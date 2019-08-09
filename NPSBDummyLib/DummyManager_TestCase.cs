@@ -59,9 +59,9 @@ namespace NPSBDummyLib
             for (int i = 0; i < DummyList.Count; ++i)
             {
                 var dummy = DummyList[i];
-                testResults.Add(Task<(bool, string)>.Run(() => {
+                testResults.Add(Task<(bool, string)>.Run(async () => {
                     var echoAction = new ActionEcho();
-                        return echoAction.EchoAsync(echoCondi);
+                        return await echoAction.EchoAsync(dummy, echoCondi);
                     }));
             }
 

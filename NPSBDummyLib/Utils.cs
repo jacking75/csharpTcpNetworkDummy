@@ -8,6 +8,8 @@ namespace NPSBDummyLib
 {
     public class Utils
     {
+        public static NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
         static public Tuple<int,int> MinMaxThreadCount()
         {
             int minWorkThreads, maxWorkThreads = 0;

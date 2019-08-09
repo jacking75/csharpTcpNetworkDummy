@@ -40,13 +40,13 @@
             this.button1 = new System.Windows.Forms.Button();
             this.listBoxLog = new System.Windows.Forms.ListBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.button4 = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.button7 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
@@ -62,8 +62,6 @@
             this.textBox8 = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.button9 = new System.Windows.Forms.Button();
-            this.textBox9 = new System.Windows.Forms.TextBox();
-            this.label10 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -189,16 +187,6 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "접속/끊기 반복";
             // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(737, 86);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(209, 18);
-            this.checkBox1.TabIndex = 13;
-            this.checkBox1.Text = "랜덤하게 데이터 보내기 포함";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
             // textBox2
             // 
             this.textBox2.Location = new System.Drawing.Point(209, 17);
@@ -252,6 +240,16 @@
             this.button4.Text = "Start";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(715, 25);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(209, 18);
+            this.checkBox1.TabIndex = 13;
+            this.checkBox1.Text = "랜덤하게 데이터 보내기 포함";
+            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // groupBox4
             // 
@@ -316,8 +314,6 @@
             this.groupBox5.Controls.Add(this.textBox8);
             this.groupBox5.Controls.Add(this.label9);
             this.groupBox5.Controls.Add(this.button9);
-            this.groupBox5.Controls.Add(this.textBox9);
-            this.groupBox5.Controls.Add(this.label10);
             this.groupBox5.Location = new System.Drawing.Point(10, 188);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(958, 111);
@@ -327,7 +323,7 @@
             // 
             // textBox11
             // 
-            this.textBox11.Location = new System.Drawing.Point(645, 24);
+            this.textBox11.Location = new System.Drawing.Point(533, 25);
             this.textBox11.Name = "textBox11";
             this.textBox11.Size = new System.Drawing.Size(39, 22);
             this.textBox11.TabIndex = 15;
@@ -335,7 +331,7 @@
             // 
             // textBox10
             // 
-            this.textBox10.Location = new System.Drawing.Point(602, 24);
+            this.textBox10.Location = new System.Drawing.Point(490, 25);
             this.textBox10.Name = "textBox10";
             this.textBox10.Size = new System.Drawing.Size(39, 22);
             this.textBox10.TabIndex = 14;
@@ -344,7 +340,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(425, 28);
+            this.label11.Location = new System.Drawing.Point(308, 29);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(183, 14);
             this.label11.TabIndex = 13;
@@ -352,7 +348,7 @@
             // 
             // textBox7
             // 
-            this.textBox7.Location = new System.Drawing.Point(338, 22);
+            this.textBox7.Location = new System.Drawing.Point(227, 23);
             this.textBox7.Name = "textBox7";
             this.textBox7.Size = new System.Drawing.Size(50, 22);
             this.textBox7.TabIndex = 12;
@@ -361,7 +357,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(247, 26);
+            this.label8.Location = new System.Drawing.Point(135, 27);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(94, 14);
             this.label8.TabIndex = 11;
@@ -369,7 +365,7 @@
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(759, 20);
+            this.button8.Location = new System.Drawing.Point(647, 21);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(47, 24);
             this.button8.TabIndex = 11;
@@ -379,7 +375,7 @@
             // 
             // textBox8
             // 
-            this.textBox8.Location = new System.Drawing.Point(189, 20);
+            this.textBox8.Location = new System.Drawing.Point(77, 21);
             this.textBox8.Name = "textBox8";
             this.textBox8.Size = new System.Drawing.Size(50, 22);
             this.textBox8.TabIndex = 10;
@@ -388,7 +384,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(121, 25);
+            this.label9.Location = new System.Drawing.Point(9, 26);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(68, 14);
             this.label9.TabIndex = 9;
@@ -396,30 +392,13 @@
             // 
             // button9
             // 
-            this.button9.Location = new System.Drawing.Point(705, 20);
+            this.button9.Location = new System.Drawing.Point(593, 21);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(47, 24);
             this.button9.TabIndex = 2;
             this.button9.Text = "Start";
             this.button9.UseVisualStyleBackColor = true;
             this.button9.Click += new System.EventHandler(this.button9_Click);
-            // 
-            // textBox9
-            // 
-            this.textBox9.Location = new System.Drawing.Point(62, 22);
-            this.textBox9.Name = "textBox9";
-            this.textBox9.Size = new System.Drawing.Size(50, 22);
-            this.textBox9.TabIndex = 6;
-            this.textBox9.Text = "64";
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(7, 26);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(54, 14);
-            this.label10.TabIndex = 5;
-            this.label10.Text = "접속 수";
             // 
             // MainForm
             // 
@@ -484,8 +463,6 @@
         private System.Windows.Forms.TextBox textBox8;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Button button9;
-        private System.Windows.Forms.TextBox textBox9;
-        private System.Windows.Forms.Label label10;
     }
 }
 
