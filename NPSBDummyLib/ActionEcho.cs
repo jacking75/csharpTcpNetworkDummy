@@ -33,7 +33,7 @@ namespace NPSBDummyLib
                 while (true)
                 {
                     // 스레드 잘 사용하는지 알기 위해 스레드 번호찍기
-                    Utils.Logger.Debug($"Echo-Send. ClientIndex: {dummy.Index}");
+                    //Utils.Logger.Debug($"Echo-Send. ClientIndex: {dummy.Index}");
 
                     SendPacket.SetData(cond.PacketSizeMin, cond.PacketSizeMax);
                     var sendError = await clientSocket.SendAsync(SendPacket.BufferSize, SendPacket.BufferData);
@@ -44,7 +44,7 @@ namespace NPSBDummyLib
 
 
                     // 스레드 잘 사용하는지 알기 위해 스레드 번호찍기
-                    Utils.Logger.Debug($"Echo-Recv. ClientIndex: {dummy.Index}");
+                    //Utils.Logger.Debug($"Echo-Recv. ClientIndex: {dummy.Index}");
 
                     var (recvCount, recvError) = await clientSocket.ReceiveAsync(RecvPacket.BufferSize, RecvPacket.Buffer);
                     if (recvError != "")
