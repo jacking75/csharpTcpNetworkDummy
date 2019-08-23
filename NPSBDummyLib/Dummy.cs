@@ -1,32 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NPSBDummyLib
 {
-    public class Dummy
+    public partial class Dummy
     {
         public Int32 Index { get; private set; }
 
+        public Int32 RoomNumber { get; set; }
+
         public AsyncSocket ClientSocket = new AsyncSocket();
 
-        SendPacketInfo SendPacket = new SendPacketInfo();
-        RecvPacketInfo RecvPacket = new RecvPacketInfo();
+        private SendPacketInfo SendPacket = new SendPacketInfo();
+        private RecvPacketInfo RecvPacket = new RecvPacketInfo();
+
 
         public Int64 ConnectCount { get; private set; }
 
         public bool IsSuccessd { get; private set; } = false;
 
         string LastExceptionMessage;
-                        
 
         public void Connected() { ++ConnectCount;  }
 
 
-        public void Init(Int32 index)
+        public void Init(Int32 index, TestConfig config)
         {
             Index = index;
+            SendPacket.Init(DummyManager.GetDummyInfo.PacketSizeMax);
+            RecvPacket.Init(DummyManager.GetDummyInfo.PacketSizeMax);
+        }
+
+        public string GetUserID()
+        {
+            return $"User{Index}";
         }
 
         public async Task<(bool Result, string Error)> ConnectAsyncAndReTry(string ip, int port)
@@ -56,16 +63,22 @@ namespace NPSBDummyLib
 
 
 #pragma warning disable 1998
-        public void DisConnect()
+        public Int64 DisConnect()
         {
+            Int64 currentCount = 0;
             try
             {
-                ClientSocket.Close();
+                if (ClientSocket.IsConnected())
+                {
+                    currentCount = ClientSocket.Close();
+                }
+                
             }
             catch(Exception ex)
             {
                 LastExceptionMessage = ex.Message;
             }
+            return currentCount;
         }
 #pragma warning restore 1998        
     }

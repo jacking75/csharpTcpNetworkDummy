@@ -1,10 +1,14 @@
-﻿using System;
+﻿using CSBaseLib;
+using NPSBDummyLib;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,7 +19,7 @@ namespace TcpDummyClient
     {
         NPSBDummyLib.DummyManager DummyManager = new NPSBDummyLib.DummyManager();
         
-        System.Collections.Concurrent.ConcurrentQueue<string> logMsgQueue;
+        System.Collections.Concurrent.ConcurrentQueue<ReportData> logMsgQueue;
 
         System.Windows.Threading.DispatcherTimer dispatcherUITimer;
         System.Windows.Threading.DispatcherTimer dispatcherLogTimer;
@@ -32,8 +36,7 @@ namespace TcpDummyClient
         {
             DummyManager.LogFunc = AddLog;
             
-            logMsgQueue = new System.Collections.Concurrent.ConcurrentQueue<string>();
-            
+            logMsgQueue = new System.Collections.Concurrent.ConcurrentQueue<ReportData>();
 
             dispatcherUITimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherUITimer.Tick += new EventHandler(UpdateUI);
@@ -46,35 +49,65 @@ namespace TcpDummyClient
             dispatcherLogTimer.Start();
         }
 
-        void AddLog(string msg)
+        void AddLog(ReportData msg)
         {
             logMsgQueue.Enqueue(msg);
         }
 
-        void testResultToUILog(Int64 testIndex)
+        void AddLog(string msg)
         {
-            var testResult = DummyManager.GetTestResult(testIndex);
-            foreach (var result in testResult)
+            logMsgQueue.Enqueue(new ReportData(msg));
+        }
+
+        void testResultToUILog(Int64 testIndex, TestConfig config)
+        {
+            var testResult = DummyManager.GetTestResult(testIndex, config);
+            foreach (var report in testResult)
             {
-                AddLog(result);
-            }
+                AddLog(report);
+            } 
         }
 
         #region 테스트 설정 값
-        (int, string, int) GetTestBaseConfig()
+        TestConfig GetTestBaseConfig()
         {
-            return (textBoxDummyCount.Text.ToInt32(), textBoxIP.Text, textBoxPort.Text.ToInt32());
+            var config = new NPSBDummyLib.TestConfig
+            {
+                ActionIntervalTime = textBox3.Text.ToInt32(),
+                ActionRepeatCount = textBox12.Text.ToInt32(),
+                DummyIntervalTime = textBox14.Text.ToInt32(),
+                LimitActionTime = textBox9.Text.ToInt32(),
+                RoomNumber = textBox2.Text.ToInt32(),
+                ChatMessage = textBox6.Text,
+                MaxVaildActionRecvCount = 3,
+            };
+
+            return config;
+        }
+
+        DummyInfo GetBaseDummyInfo()
+        {
+            var dummyInfo = new NPSBDummyLib.DummyInfo
+            {
+                RmoteIP = textBoxIP.Text,
+                RemotePort = textBoxPort.Text.ToInt32(),
+                DummyCount = textBoxDummyCount.Text.ToInt32(),
+                PacketSizeMax = textBox13.Text.ToInt32(),
+                IsRecvDetailProc = (checkBox2.CheckState == CheckState.Checked) ? true : false,
+            };
+
+            return dummyInfo;
         }
 
         NPSBDummyLib.EchoCondition GetTestEchoConfig()
         {
-            (var conCount, var ip, var port) = GetTestBaseConfig();
+            var config = GetTestBaseConfig();
             var repeatCount = textBox8.Text.ToInt32();
             var repeatTimeSec = textBox7.Text.ToInt32();
 
             var echoCondi = new NPSBDummyLib.EchoCondition();
-            echoCondi.IP = ip;
-            echoCondi.Port = port;
+            echoCondi.IP = DummyManager.GetDummyInfo.RmoteIP;
+            echoCondi.Port = DummyManager.GetDummyInfo.RemotePort;
             echoCondi.PacketSizeMin = textBox10.Text.ToInt32();
             echoCondi.PacketSizeMax = textBox11.Text.ToInt32();
             echoCondi.Set(repeatCount, repeatTimeSec);
@@ -120,26 +153,24 @@ namespace TcpDummyClient
         // 접속만....연결하기
         private async void button1_Click(object sender, EventArgs e)
         {
-            (var conCount, var ip, var port) = GetTestBaseConfig();
-            var config = new NPSBDummyLib.TestConfig
-            {
-                RmoteIP = ip,
-                RemotePort = port,
-                DummyCount = conCount,
-                ActionCase = NPSBDummyLib.TestCase.ONLY_CONNECT
-            };
+            var config = GetTestBaseConfig();
+            DummyManager.SetDummyInfo = GetBaseDummyInfo();
+            config.ActionCase = NPSBDummyLib.TestCase.ONLY_CONNECT;
+
             DummyManager.Prepare(config);
 
             var testUniqueId = DateTime.Now.Ticks;
             await DummyManager.TestConnectOnlyAsync(testUniqueId);
 
-            testResultToUILog(testUniqueId);                       
+            testResultToUILog(testUniqueId, config);
         }
+
         // 접속만.... - 접속 끊기
         private void button2_Click(object sender, EventArgs e)
         {
             AddLog($"End - {DummyManager.CurrentTestCase()}");
-            DummyManager.EndTest();            
+            DummyManager.EndTest();
+
         }
         #endregion
 
@@ -147,26 +178,20 @@ namespace TcpDummyClient
         // 테스트 시작 - 접속/끊기 반복
         private async void button4_Click(object sender, EventArgs e)
         {
-            (var conCount, var ip, var port) = GetTestBaseConfig();
-            var config = new NPSBDummyLib.TestConfig
-            {
-                RmoteIP = ip,
-                RemotePort = port,
-                DummyCount = conCount,
-                RepeatConnectCount = textBox5.Text.ToInt64(),
-                RepeatConnectDateTimeSec = textBox2.Text.ToInt64()
-            };
+            var config = GetTestBaseConfig();
+            config.ActionCase = NPSBDummyLib.TestCase.REPEAT_CONNECT;
+            DummyManager.SetDummyInfo = GetBaseDummyInfo();
 
             var testUniqueIndex = DateTime.Now.Ticks;
 
-            config.ActionCase = NPSBDummyLib.TestCase.REPEAT_CONNECT;
             DummyManager.Prepare(config);
                         
             await DummyManager.TestRepeatConnectAsync(testUniqueIndex);
             
-            testResultToUILog(testUniqueIndex);
-            AddLog($"End - {DummyManager.CurrentTestCase()}");
+            testResultToUILog(testUniqueIndex, config);
+            AddLog($"End - {config.ActionCase}");
             DummyManager.EndTest();
+            
         }
         // 테스트 중단 - 접속/끊기 반복
         private void button3_Click(object sender, EventArgs e)
@@ -180,11 +205,10 @@ namespace TcpDummyClient
         #region 에코 테스트
         private async void button9_Click(object sender, EventArgs e)
         {
-            (var conCount, var ip, var port) = GetTestBaseConfig();
-            var config = new NPSBDummyLib.TestConfig();
-            config.DummyCount = conCount;
+            var config = GetTestBaseConfig();
             config.ActionCase = NPSBDummyLib.TestCase.ECHO;
-
+            DummyManager.SetDummyInfo = GetBaseDummyInfo();
+           
             DummyManager.Prepare(config);
 
 
@@ -194,7 +218,7 @@ namespace TcpDummyClient
             AddLog($"Start - {DummyManager.CurrentTestCase()}, Condi_Count:{echoCondi.EchoCount}, Condi_Time:{echoCondi.EchoTime}");
             await DummyManager.TestRepeatEchoAsync(testUniqueIndex, echoCondi);
             
-            testResultToUILog(testUniqueIndex);
+            testResultToUILog(testUniqueIndex, config);
             AddLog($"End - {DummyManager.CurrentTestCase()}");
 
             DummyManager.EndTest();
@@ -212,31 +236,30 @@ namespace TcpDummyClient
 
 
         #region Test
-        // Test 연결
+        // Test 로그인
         private void button5_Click(object sender, EventArgs e)
         {
-            //var config = GetTestConfig();
-
-            //var result = DevTestgSendReceive.Connect(config.RemoteIP, config.RemotePort);
-
-            //AddLog(result);
+            var config = GetTestBaseConfig();
+            listBoxAction.Items.Add(new ActionData(TestCase.ACTION_LOGIN, "로그인", config));
         }
 
-        // Test 접속 끊기
+        // Test 액션 모두 삭제
         private void button6_Click(object sender, EventArgs e)
         {
-            //DevTestgSendReceive.Close();
-
-            //AddLog("서버와 접속 끊음");
+            listBoxAction.Items.Clear();
+            //AddLog("액션 모두 삭제");
         }
 
         // Test 보내기
         private void button7_Click(object sender, EventArgs e)
         {
-            //if(string.IsNullOrEmpty(textBox6.Text))
-            //{
-            //    return;
-            //}
+            if(string.IsNullOrEmpty(textBox6.Text))
+            {
+                return;
+            }
+
+            var config = GetTestBaseConfig();
+            listBoxAction.Items.Add(new ActionData(TestCase.ACTION_ROOM_CHAT, "방채팅", config));
 
             //DevTestgSendReceive.SendData(textBox6.Text);
         }
@@ -247,21 +270,7 @@ namespace TcpDummyClient
         {
             try
             {
-                var currentTest = DummyManager.CurrentTestCase();
-
-                switch(currentTest)
-                {
-                    case NPSBDummyLib.TestCase.ONLY_CONNECT:
-                        {
-                            textBox1.Text = NPSBDummyLib.DummyManager.ConnectedDummyCount().ToString();
-                        }
-                        break;
-                    default:
-                        {
-                            textBox1.Text = "0";
-                        }
-                        break;
-                }
+                textBox1.Text = NPSBDummyLib.DummyManager.ConnectedDummyCount().ToString();   
             }
             catch (Exception ex)
             {
@@ -276,9 +285,9 @@ namespace TcpDummyClient
 
             while (true)
             {
-                string msg;
+                ReportData report;
 
-                if (logMsgQueue.TryDequeue(out msg) == false)
+                if (logMsgQueue.TryDequeue(out report) == false)
                 {
                     break;
                 }
@@ -287,10 +296,11 @@ namespace TcpDummyClient
 
                 if (listBoxLog.Items.Count > 512)
                 {
-                    listBoxLog.Items.Clear();
+                    listBoxLog.Items.RemoveAt(0);
+                    //listBoxLog.Items.Clear();
                 }
-
-                listBoxLog.Items.Add(msg);
+                
+                listBoxLog.Items.Add(report);
                 listBoxLog.SelectedIndex = listBoxLog.Items.Count - 1;
 
                 if (logWorkCount > 16)
@@ -301,5 +311,116 @@ namespace TcpDummyClient
         }
 
 
+        private async void buttonStartAction_Click(object sender, EventArgs e)
+        {
+            DummyManager.Init();
+            var dummyInfo = GetBaseDummyInfo();
+            DummyManager.SetDummyInfo = dummyInfo;
+
+            var totalRepeatCount = textBox4.Text.ToInt32();
+            var testUniqueId = DateTime.Now.Ticks;
+
+            if (listBoxAction.Items.Count > 0)
+            {
+                for (int repeatCount = 0; repeatCount < totalRepeatCount; ++repeatCount)
+                {
+                    int selectedIdx = 0;
+                    var actionList = listBoxAction.Items.Cast<ActionData>().ToList();
+
+                    foreach (ActionData item in actionList)
+                    {
+                        var config = item.Config;
+
+                        listBoxAction.SetSelected(selectedIdx, true);
+                        DummyManager.Prepare(item.Config);
+                        for (int repeatCnt = 0; repeatCnt < item.Config.ActionRepeatCount; ++repeatCnt)
+                        {
+                            await DummyManager.RunAction(testUniqueId, item.TestCase, config);
+                            testResultToUILog(testUniqueId, config);
+
+                            await Task.Delay(config.ActionIntervalTime);
+                        }
+
+                        ++selectedIdx;
+                    }
+                }
+
+                DummyManager.Clear();
+            }
+        }
+
+        private void buttonDeleteAction_Click(object sender, EventArgs e)
+        {
+            if (listBoxAction.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            var index = listBoxAction.SelectedIndex;
+
+            listBoxAction.Items.RemoveAt(index);
+        }
+
+        private void listBoxLog_DoubleClick(object sender, EventArgs e)
+        {
+            if (listBoxLog.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            ReportData curItem = (ReportData)listBoxLog.SelectedItem;
+            if (curItem.Detail != null)
+            {
+                MessageBox.Show(curItem.Detail);
+            }
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            var config = GetTestBaseConfig();
+            listBoxAction.Items.Add(new ActionData(TestCase.ACTION_ROOM_ENTER, "방입장", config));
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            var config = GetTestBaseConfig();
+            listBoxAction.Items.Add(new ActionData(TestCase.ACTION_ROOM_LEAVE, "방퇴장", config));
+        }
+
+        private void listBoxAction_DoubleClick(object sender, EventArgs e)
+        {
+            if (listBoxAction.SelectedIndex == -1)
+            {
+                return;
+            }
+
+            ActionData curItem = (ActionData)listBoxAction.SelectedItem;
+            if (curItem.Config != null)
+            {
+                MessageBox.Show(curItem.Config.ToString());
+            }
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(DummyManager.ToPacketStat());
+        }
+
+        private void button13_Click(object sender, EventArgs e)
+        {
+            listBoxLog.Items.Clear();
+        }
+
+        private void button14_Click(object sender, EventArgs e)
+        {
+            var config = GetTestBaseConfig();
+            listBoxAction.Items.Add(new ActionData(TestCase.ACTION_CONNECT, "연결시도", config));
+        }
+
+        private void button15_Click(object sender, EventArgs e)
+        {
+            var config = GetTestBaseConfig();
+            listBoxAction.Items.Add(new ActionData(TestCase.ACTION_DISCONNECT, "연결해제", config));
+        }
     }
 }

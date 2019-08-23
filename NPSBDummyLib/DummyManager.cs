@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace NPSBDummyLib
 {
@@ -14,8 +12,10 @@ namespace NPSBDummyLib
 
         TestResultManager TestResultMgr = new TestResultManager();
 
-        bool InProgress;
-                
+        static bool InProgress;
+
+        static DummyInfo DummyInfo;
+
         public Action<string> LogFunc; //[진행중] [완료] [실패]
 
 
@@ -24,61 +24,121 @@ namespace NPSBDummyLib
         {
             return CurrentConnectingCount;
         }
-        static public void DummyConnected()
+        static public Int64 DummyConnected()
         {
-            Interlocked.Increment(ref CurrentConnectingCount);
+            return Interlocked.Increment(ref CurrentConnectingCount);
         }
-        static public void DummyDisConnected()
+        static public Int64 DummyDisConnected()
         {
-            Interlocked.Decrement(ref CurrentConnectingCount);
+            return Interlocked.Decrement(ref CurrentConnectingCount);
+        }
+
+        public static DummyInfo GetDummyInfo
+        {
+            get
+            {
+                return DummyInfo;
+            }
+        }
+
+        public static DummyInfo SetDummyInfo
+        {
+            set
+            {
+                DummyInfo = value;
+            }
+        }
+
+        public Dummy GetDummy(int index)
+        {
+            if (index < 0 || index >= DummyList.Count)
+            {
+                return null;
+            }
+
+            return DummyList[index];
+        }
+
+        public void Init()
+        {
+            Clear();
+            TestResultMgr.Clear();
         }
 
         public bool Prepare(TestConfig config)
         {
-            CurrentConnectingCount = 0;
-            DummyList.Clear();
-
             Config = config;
 
-            for(int i = 0; i < Config.DummyCount; ++i)
+            switch (config.ActionCase)
             {
-                var dummy = new Dummy();
-                dummy.Init(i);
-                DummyList.Add(dummy);
+                case TestCase.ONLY_CONNECT:
+                case TestCase.REPEAT_CONNECT:
+                case TestCase.ECHO:
+                case TestCase.ACTION_CONNECT:
+                    if (!IsInProgress())
+                    {
+                        CurrentConnectingCount = 0;
+                        DummyList.Clear();
+
+                        for (int i = 0; i < DummyManager.GetDummyInfo.DummyCount; ++i)
+                        {
+                            var dummy = new Dummy();
+                            dummy.Init(i, config);
+                            DummyList.Add(dummy);   
+                        }
+                        InProgress = true;
+                    }
+                    break;
             }
-            InProgress = true;
-            
-            return false;
+
+            return true;
         }
-                
+
+        public void EndProgress()
+        {
+            InProgress = false;
+        }
+
         public void EndTest()
         {
             InProgress = false;
+            
+            DummyList.Clear();
+            Config.ActionCase = TestCase.NONE;
+        }
 
-            Thread.Sleep(2000);
+        public void Clear()
+        {
+            EndTest();
 
-            for (int i = 0; i < Config.DummyCount; ++i)
+            for (int i = 0; i < DummyList.Count; ++i)
             {
-                if(DummyList[i] == null)
+                if (DummyList[i] == null)
                 {
                     continue;
                 }
 
                 DummyList[i].DisConnect();
             }
-            DummyList.Clear();
 
-            Config.ActionCase = TestCase.NONE;
+            DummyList.Clear();
+            CurrentConnectingCount = 0;
         }
 
-        public bool IsInProgress()
+        public static bool IsInProgress()
         {
             return InProgress;
         }
 
-        public List<string> GetTestResult(Int64 testIndex )
+        public List<ReportData> GetTestResult(Int64 testIndex, TestConfig config)
         {
-            return TestResultMgr.WriteTestResult(testIndex, Config);
+            return TestResultMgr.WriteTestResult(testIndex, config);
+        }
+
+        public string ToPacketStat()
+        {
+            var result = TestResultMgr.MakePacketStat();
+            return result;
         }
 
         public TestCase CurrentTestCase()
@@ -87,11 +147,8 @@ namespace NPSBDummyLib
         }
 
 
-
-
-
-            // Host 프로그램에 메시지를 보낼 큐 혹은 델리게이트. 에러, 로그, 결과를 보냄
-            // Host 프로그램에서 메시지를 받을 큐 혹은 델리게이트. 중단 메시지를 받음
+        // Host 프로그램에 메시지를 보낼 큐 혹은 델리게이트. 에러, 로그, 결과를 보냄
+        // Host 프로그램에서 메시지를 받을 큐 혹은 델리게이트. 중단 메시지를 받음
 
         //System.Threading.Interlocked.Increment(ref ConnectedCount);
         //System.Threading.Interlocked.Decrement(ref ConnectedCount);

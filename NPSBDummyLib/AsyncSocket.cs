@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NPSBDummyLib
@@ -55,6 +53,38 @@ namespace NPSBDummyLib
             }            
         }
 
+        public async Task<(int, string)> ReceiveAsyncWithTimeOut(int bufferSize, byte[] buffer, Int64 timeOutSec)
+        {
+            try
+            {
+                var stream = Client.GetStream();
+                stream.ReadTimeout = (int)timeOutSec * 1000;
+                Task<int> readTask = stream.ReadAsync(buffer, 0, bufferSize);//.ConfigureAwait(false);
+
+                Task delayTask = Task.Delay(stream.ReadTimeout);
+                Task task = await Task.WhenAny(readTask, delayTask);
+
+                if (task != readTask)
+                {
+                    return (-1, "");
+                }
+
+                return (await readTask, "");
+
+                //using (var stream = Client.GetStream())
+                //{
+                //    var length = await stream.ReadAsync(buffer, 0, bufferSize);//.ConfigureAwait(false);
+                //    return (length, "");
+                //}
+            }
+            catch (Exception ex)
+            {
+                LastExceptionMessage = ex.Message;
+                Client.Close();
+                return (-1, ex.Message);
+            }
+        }
+
         public async Task<string> SendAsync(int bufferSize, byte[] buffer)
         {
             try
@@ -71,8 +101,10 @@ namespace NPSBDummyLib
             }            
         }
 
-        public void Close()
+        public Int64 Close()
         {
+            Int64 currentCount = 0;
+
             try
             {
                 Client.Close();                
@@ -83,8 +115,10 @@ namespace NPSBDummyLib
             }
             finally
             {
-                DummyManager.DummyDisConnected();
-            }            
+                currentCount = DummyManager.DummyDisConnected();
+            }
+
+            return currentCount;
         }
     }
 }
