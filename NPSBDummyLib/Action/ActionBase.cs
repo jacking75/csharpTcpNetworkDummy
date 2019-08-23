@@ -14,9 +14,8 @@ namespace NPSBDummyLib
         public TestCase TestType { get; private set; }
         public TestConfig TestConfig { get; private set; }
 
-        //public Action<string> MsgFunc; //[진행중] [완료] [실패]
         public HashSet<PACKETID> CheckPacketIDSet = new HashSet<PACKETID>();
-        protected DummyManager DummyManager;
+        protected DummyManager DummyManager; //TODO 최흥배 DummyManager 객체를 가질 필요가 없을 것 같습니다. 필요한 함수만 전달하는 것으로 했으면 합니다.
         protected Dictionary<PACKETID, RecvFunc> RecvFuncDic = new Dictionary<PACKETID, RecvFunc>();
 
         public ActionBase(TestCase testType, DummyManager dummyManager, TestConfig config)
