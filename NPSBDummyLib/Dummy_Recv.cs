@@ -12,7 +12,7 @@ namespace NPSBDummyLib
     {
         Task WorkerThread;
         Dictionary<PACKETID, int> PacketStatDic = new Dictionary<PACKETID, int>();
-        Channel<TaskCompletionSource<(EResultCode, PACKETID, byte[])>> RecvResultChannel = Channel.CreateUnbounded<TaskCompletionSource<(EResultCode, PACKETID, byte[])>>();
+        Channel<TaskCompletionSource<ObjectComponentPacket>> RecvResultChannel = Channel.CreateUnbounded<TaskCompletionSource<ObjectComponentPacket>>();
 
         public void IncreasePacket(PACKETID packetId)
         {
@@ -33,22 +33,24 @@ namespace NPSBDummyLib
             return result;
         }
 
-        public async Task EnqueueResult((EResultCode, PACKETID, byte[]) result)
+        public async Task EnqueueResult(ObjectComponentPacket result)
         {
-            var tcs = new TaskCompletionSource<(EResultCode, PACKETID, byte[])>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var tcs = new TaskCompletionSource<ObjectComponentPacket>(TaskCreationOptions.RunContinuationsAsynchronously);
             tcs.SetResult(result);
             await RecvResultChannel.Writer.WriteAsync(tcs);
             await tcs.Task;
         }
 
-        public async Task<(EResultCode, PACKETID, byte[])> PopRecvResult(int limitActionTime)
+        public async Task<ObjectComponentPacket> PopRecvResult(int limitActionTime)
         {
             var cts = new CancellationTokenSource(limitActionTime);
             await RecvResultChannel.Reader.WaitToReadAsync(cts.Token);
 
             if (!RecvResultChannel.Reader.TryRead(out var resultTask))
             {
-                return (EResultCode.RESULT_FAILED_POP_CHANNEL, 0, null);
+                var packetObj = ObjectPool<ObjectComponentPacket>.GetInstance.Get();
+                packetObj.ResultCode = EResultCode.RESULT_FAILED_POP_CHANNEL;
+                return packetObj;
             }
 
             return resultTask.Task.Result;
@@ -57,20 +59,21 @@ namespace NPSBDummyLib
         public void CreateRecvWorker()
         {
             WorkerThread = Task.Run(async () => {
-                while (DummyManager.IsInProgress())
+                IsConnected = true;
+                while (IsConnected)
                 {
                     var (recvCount, recvError) = await ClientSocket.ReceiveAsync(RecvPacket.BufferSize, RecvPacket.RecvBuffer);
 
                     var result = await RecvProc(recvCount, recvError);
                     if (!result)
                     {
-                        if (DummyManager.IsInProgress())
+                        if (IsConnected)
                         {
                             DummyManager.DummyDisConnected();
                             await ConnectAsyncAndReTry(DummyManager.GetDummyInfo.RmoteIP, DummyManager.GetDummyInfo.RemotePort);
                             continue;
                         }
-
+                       
                         break;
                     }
                 }
@@ -83,19 +86,26 @@ namespace NPSBDummyLib
             {
                 if (DummyManager.IsInProgress())
                 {
-                    await EnqueueResult((EResultCode.RESULT_OK, 0, null));
+                    var packetObj = ObjectPool<ObjectComponentPacket>.GetInstance.Get();
+                    packetObj.ResultCode = EResultCode.RESULT_RECV_ERROR;
+                    packetObj.PacketId = PACKETID.CS_END;
+                    await EnqueueResult(packetObj);
                     return false;
                 }
                 else
                 {
-                    await EnqueueResult((EResultCode.RESULT_RECV_ERROR, 0, null));
+                    var packetObj = ObjectPool<ObjectComponentPacket>.GetInstance.Get();
+                    packetObj.ResultCode = EResultCode.RESULT_OK;
+                    await EnqueueResult(packetObj);
                     return false;
                 }
             }
 
             if (recvCount == 0)
             {
-                await EnqueueResult((EResultCode.RESULT_CONNECTION_EXPIRED, 0, null));
+                var packetObj = ObjectPool<ObjectComponentPacket>.GetInstance.Get();
+                packetObj.ResultCode = EResultCode.RESULT_CONNECTION_EXPIRED;
+                await EnqueueResult(packetObj);
                 return false;
             }
 
@@ -105,12 +115,15 @@ namespace NPSBDummyLib
 
             while (recvCount >= (packetSize = BitConverter.ToInt16(RecvPacket.RecvBuffer, 0)))
             {
-                var packetID = (PACKETID)BitConverter.ToInt16(RecvPacket.RecvBuffer, 2);
-                var recvBuffer = PacketToBytes.SplitPacketBuffer(recvCount, RecvPacket);
+                var packetObj = ObjectPool<ObjectComponentPacket>.GetInstance.Get();
+                packetObj.ResultCode = EResultCode.RESULT_OK;
+                packetObj.PacketId = (PACKETID)BitConverter.ToInt16(RecvPacket.RecvBuffer, 2);
+                PacketToBytes.SplitPacketBuffer(recvCount, RecvPacket, packetObj);
 
-                await EnqueueResult((EResultCode.RESULT_OK, packetID, recvBuffer));
 
-                IncreasePacket(packetID);
+                await EnqueueResult(packetObj);
+
+                IncreasePacket(packetObj.PacketId);
                 recvCount -= packetSize;
             }
 

@@ -15,12 +15,13 @@ namespace NPSBDummyLib
             return "Connect";
         }
 
-        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy)
+        protected override async Task<(bool, string)> TaskAsync(Dummy dummy)
         {
+            
             var result = await dummy.ConnectAsyncAndReTry(DummyManager.GetDummyInfo.RmoteIP, DummyManager.GetDummyInfo.RemotePort);
             if (result.Result == false)
             {
-                return (dummy.Index, false, result.Error);
+                return Utils.MakeResult(dummy.Index, false, result.Error);
             }
             else
             {
@@ -29,7 +30,7 @@ namespace NPSBDummyLib
             }
 
             dummy.SetSuccess(true);
-            return (dummy.Index, true, "");
+            return Utils.MakeResult(dummy.Index, true, "");
         }
     }
 }

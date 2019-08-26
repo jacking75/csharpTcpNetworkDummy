@@ -68,7 +68,7 @@ namespace NPSBDummyLib
 
         public async Task RunAction(Int64 testUniqueId, TestCase testType, TestConfig config)
         {
-            var testResults = new List<Task<(int, bool, string)>>();
+            var testResults = new List<Task<(bool, string)>>();
             var actionList = new List<ActionBase>();
             var startTime = DateTime.Now;
 
@@ -88,7 +88,7 @@ namespace NPSBDummyLib
                     await Task.Delay(config.DummyIntervalTime);
                 }
 
-                testResults.Add(Task<(int, bool, string)>.Run(() => {
+                testResults.Add(Task<(bool, string)>.Run(() => {
                     return action.Run(dummy);
                 }));
             }
@@ -157,17 +157,11 @@ namespace NPSBDummyLib
             TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList, startTime);
         }
 
-
-        public async Task TestLoginAsync(Int64 testUniqueId, TestConfig config)
-        {
-            await RunTestScenario(testUniqueId, config, DummyList, AddDummyScenarioLogin);            
-        }
-
-
-        async Task RunTestScenario(Int64 testUniqueId, TestConfig config, List<Dummy> dummyList, Action<List<Task<(bool, string)>> , Dummy, Int64, TestConfig> scenarioTask)
+        async Task RunTestScenario(Int64 testUniqueId, TestConfig config, List<Dummy> dummyList, Action<List<Task<(bool, string)>>, Dummy, Int64, TestConfig> scenarioTask)
         {
             var startTime = DateTime.Now;
             var testResults = new List<Task<(bool, string)>>();
+            SetConfigure(config);
 
             for (int i = 0; i < dummyList.Count; ++i)
             {
@@ -177,7 +171,12 @@ namespace NPSBDummyLib
 
             await Task.WhenAll(testResults.ToArray());
 
-            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList, startTime);
+            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList, startTime, testResults);
+        }
+
+        public async Task TestLoginAsync(Int64 testUniqueId, TestConfig config)
+        {
+            await RunTestScenario(testUniqueId, config, DummyList, AddDummyScenarioLogin);            
         }
 
         void AddDummyScenarioLogin(List<Task<(bool, string)>> results, Dummy dummy, Int64 testUniqueId, TestConfig config)
@@ -185,6 +184,34 @@ namespace NPSBDummyLib
             results.Add(Task<(bool, string)>.Run(async () => {
 
                 var scenario = new ScenarioLogin();
+                return await scenario.TaskAsync(dummy, config);
+            }));
+        }
+
+        public async Task TestRepeatConnAsync(Int64 testUniqueId, TestConfig config)
+        {
+            await RunTestScenario(testUniqueId, config, DummyList, AddDummyScenarioRepeatConn);
+        }
+
+        void AddDummyScenarioRepeatConn(List<Task<(bool, string)>> results, Dummy dummy, Int64 testUniqueId, TestConfig config)
+        {
+            results.Add(Task<(bool, string)>.Run(async () => {
+
+                var scenario = new ScenarioRepeatConn();
+                return await scenario.TaskAsync(dummy, config);
+            }));
+        }
+
+        public async Task TestRoomChatAsync(Int64 testUniqueId, TestConfig config)
+        {
+            await RunTestScenario(testUniqueId, config, DummyList, AddDummyScenarioRoomChat);
+        }
+
+        void AddDummyScenarioRoomChat(List<Task<(bool, string)>> results, Dummy dummy, Int64 testUniqueId, TestConfig config)
+        {
+            results.Add(Task<(bool, string)>.Run(async () => {
+
+                var scenario = new ScenarioRoomChat();
                 return await scenario.TaskAsync(dummy, config);
             }));
         }

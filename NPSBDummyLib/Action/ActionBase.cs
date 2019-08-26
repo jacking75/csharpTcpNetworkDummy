@@ -8,12 +8,12 @@ namespace NPSBDummyLib
 {
     public partial class ActionBase
     {
-        public delegate (int, bool, string) RecvFunc(Dummy dummy, PACKETID packetId, byte[] packetBuffer);
-
+        public delegate (bool, string) RecvFunc(Dummy dummy, PACKETID packetId, byte[] packetBuffer);
 
         public TestCase TestType { get; private set; }
         public TestConfig TestConfig { get; private set; }
 
+        public List<PACKETID> CheckPacketIDList = new List<PACKETID>();
         public HashSet<PACKETID> CheckPacketIDSet = new HashSet<PACKETID>();
         protected Dictionary<PACKETID, RecvFunc> RecvFuncDic = new Dictionary<PACKETID, RecvFunc>();
 
@@ -34,7 +34,7 @@ namespace NPSBDummyLib
             RecvFuncDic.Add(packetId, func);
             if (isCheck)
             {
-                CheckPacketIDSet.Add(packetId);
+                CheckPacketIDList.Add(packetId);
             }
         }
 
@@ -63,10 +63,19 @@ namespace NPSBDummyLib
         }
 
 
-        async public Task<(int, bool, string)> Run(Dummy dummy)
+        async public Task<(bool, string)> Run(Dummy dummy)
         {
+            Before(dummy);
+
             // 여기에 perf 관련 데이터 추가
             var result = await TaskAsync(dummy);
+
+            if (TestConfig.ActionIntervalTime > 0)
+            {
+                await Task.Delay(TestConfig.ActionIntervalTime);
+            }
+
+            After();
 
             return result;
         }
@@ -78,13 +87,17 @@ namespace NPSBDummyLib
 
         public virtual void Before(Dummy dummy)
         {
+            foreach(var packetId in CheckPacketIDList)
+            {
+                CheckPacketIDSet.Add(packetId);
+            }
         }
 
         public virtual void After()
         {
         }
 
-        public (int, bool, string) End(Dummy dummy, bool result, string message)
+        public (bool, string) End(Dummy dummy, bool result, string message)
         {
             if (result)
             {
@@ -98,19 +111,19 @@ namespace NPSBDummyLib
             var log = $"{GetActionName()} End. DummyIndex:{dummy.Index}, result:{result}, message:{message}";
             Utils.Logger.Debug(log);
 
-            return (dummy.Index, result, log);
+            return (result, log);
         }
 
-        protected virtual async Task<(int, bool, string)> TaskAsync(Dummy dummy)
+        protected virtual async Task<(bool, string)> TaskAsync(Dummy dummy)
         {
-            return await Task.Run<(int, bool, string)>(() =>
+            return await Task.Run<(bool, string)>(() =>
             {
-                return (0, false, "Don't call me.");
+                return (false, "Don't call me.");
 
             });
         }
 
-        protected async Task<(int, bool, string)> RecvProc(Dummy dummy)
+        protected async Task<(bool, string)> RecvProc(Dummy dummy)
         {
             if (dummy == null)
             {
@@ -122,30 +135,36 @@ namespace NPSBDummyLib
             do
             {
                 var recvResult = await dummy.PopRecvResult(TestConfig.LimitActionTime);
-                (var errorCode, var packetId, var packetBuffer) = recvResult;
-
-                if (expectTime < DateTime.Now)
+                //(var errorCode, var packetId, var packetBuffer) = recvResult;
+                var errorCode = recvResult.ResultCode;
+                var packetId = recvResult.PacketId;
+                var packetBuffer = recvResult.BodyBytes;
+                
+                using (recvResult)
                 {
-                    return End(dummy, false, "시간 초과");
-                }
-
-                if (errorCode != EResultCode.RESULT_OK)
-                {
-                    return End(dummy, false, $"에러 발생:{errorCode}");
-                }
-
-                var func = GetRecvFunction(packetId);
-                if (func == null)
-                {
-                    return End(dummy, false, $"유효하지 않은 패킷({packetId})");
-                }
-
-                if (DummyManager.GetDummyInfo.IsRecvDetailProc)
-                {
-                    var (index, result, message) = func(dummy, packetId, packetBuffer);
-                    if (!result)
+                    if (expectTime < DateTime.Now)
                     {
-                        return End(dummy, false, message);
+                        return End(dummy, false, "시간 초과");
+                    }
+
+                    var func = GetRecvFunction(packetId);
+                    if (func == null)
+                    {
+                        if (errorCode != EResultCode.RESULT_OK)
+                        {
+                            return End(dummy, false, $"에러 발생:{errorCode}");
+                        }
+
+                        return End(dummy, false, $"유효하지 않은 패킷({packetId})");
+                    }
+
+                    if (DummyManager.GetDummyInfo.IsRecvDetailProc || errorCode != EResultCode.RESULT_OK)
+                    {
+                        var (result, message) = func(dummy, packetId, packetBuffer);
+                        if (!result)
+                        {
+                            return End(dummy, false, message);
+                        }
                     }
                 }
 

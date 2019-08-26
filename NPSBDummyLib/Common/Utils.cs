@@ -76,5 +76,10 @@ namespace NPSBDummyLib
 
             return sf.GetMethod().Name;
         }
+
+        public static (bool, string) MakeResult(int dummyIndex, bool result, string message)
+        {
+            return (result, $"DummyIndex:{dummyIndex}, Message:{message}");
+        }
     }
 }

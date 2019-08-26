@@ -19,7 +19,7 @@ namespace NPSBDummyLib
             return "RoomChat";
         }
 
-        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy)
+        protected override async Task<(bool, string)> TaskAsync(Dummy dummy)
         {
             var clientSocket = dummy.ClientSocket;
             try
@@ -46,19 +46,19 @@ namespace NPSBDummyLib
             }
             catch (Exception ex)
             {
-                return (dummy.Index, false, ex.ToString());
+                return Utils.MakeResult(dummy.Index, false, ex.ToString());
             }
         }
 
-        public override (int, bool, string) CheckNtfRoomChat(Dummy dummy, PACKETID packetId, byte[] packetBuffer)
+        public override (bool, string) CheckNtfRoomChat(Dummy dummy, PACKETID packetId, byte[] packetBuffer)
         {
             var body = MessagePackSerializer.Deserialize<PKTNtfRoomChat>(packetBuffer);
             if (body.ChatMessage != ChatMessage)
             {
-                return (dummy.Index, false, $"메시지 다름({body.ChatMessage})");
+                return Utils.MakeResult(dummy.Index, false, $"메시지 다름({body.ChatMessage})");
             }
 
-            return (dummy.Index, true, "");
+            return Utils.MakeResult(dummy.Index, true, "");
         }
     }
 }

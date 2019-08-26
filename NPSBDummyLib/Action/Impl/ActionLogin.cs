@@ -18,7 +18,7 @@ namespace NPSBDummyLib
             return "Login";
         }
 
-        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy)
+        protected override async Task<(bool, string)> TaskAsync(Dummy dummy)
         {
             var clientSocket = dummy.ClientSocket;
             try
@@ -45,20 +45,20 @@ namespace NPSBDummyLib
             }
             catch (Exception ex)
             {
-                return (dummy.Index, false, ex.ToString());
+                return Utils.MakeResult(dummy.Index, false, ex.ToString());
             }
         }
 
 
-        private (int, bool, string) CheckResLogin(Dummy dummy, PACKETID packetId, byte[] packetBuffer)
+        private (bool, string) CheckResLogin(Dummy dummy, PACKETID packetId, byte[] packetBuffer)
         {
             var body = MessagePackSerializer.Deserialize<PKTResLogin>(packetBuffer);
             if ((ERROR_CODE)body.Result != ERROR_CODE.NONE)
             {
-                return (dummy.Index, false, $"결과값 틀림({body.Result})");
+                return Utils.MakeResult(dummy.Index, false, $"결과값 틀림({body.Result})");
             }
 
-            return (dummy.Index, true, "");
+            return Utils.MakeResult(dummy.Index, true, "");
         }
     }
 }

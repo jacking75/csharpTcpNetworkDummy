@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 
 namespace NPSBDummyLib
 {
-    public class ScenarioLogin : ScenarioBase
+    class ScenarioRepeatConn : ScenarioBase
     {
         public override async Task<(bool, string)> TaskAsync(Dummy dummy, TestConfig config)
         {
             var connect = MakeActionFactory(TestCase.ACTION_CONNECT, config);
             var disConnect = MakeActionFactory(TestCase.ACTION_DISCONNECT, config);
-            var login = MakeActionFactory(TestCase.ACTION_LOGIN, config);
 
             var repeatCount = 0;
             var testStartTime = DateTime.Now;
@@ -20,18 +19,10 @@ namespace NPSBDummyLib
             while (true)
             {
                 taskResult = await connect.Run(dummy);
-                if(taskResult.Item1 == false)
-                {
-                    // 실패 통보하면서 더미 실행 중지
-                    return (false, "fail Connect");
-                }
-
-
-                taskResult = await login.Run(dummy);
                 if (taskResult.Item1 == false)
                 {
                     // 실패 통보하면서 더미 실행 중지
-                    return (false, "fail Login");
+                    return (false, "fail Connect");
                 }
 
 

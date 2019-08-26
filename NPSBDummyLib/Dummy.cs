@@ -10,6 +10,8 @@ namespace NPSBDummyLib
 
         public Int32 RoomNumber { get; set; }
 
+        public bool IsConnected { get; set; }
+
         public AsyncSocket ClientSocket;
         SendPacketInfo SendPacket;
         RecvPacketInfo RecvPacket;
@@ -24,13 +26,12 @@ namespace NPSBDummyLib
         public void Connected() { ++ConnectCount;  }
 
 
-        public void Init(Int32 index, TestConfig config)
+        public void Init(Int32 index)
         {
             Index = index;
             ClientSocket = new AsyncSocket();
             SendPacket = new SendPacketInfo();
             RecvPacket = new RecvPacketInfo();
-            TaskMgr = new TaskActionManager(this);
             SendPacket.Init(DummyManager.GetDummyInfo.PacketSizeMax);
             RecvPacket.Init(DummyManager.GetDummyInfo.PacketSizeMax);
         }
@@ -75,6 +76,7 @@ namespace NPSBDummyLib
                 if (ClientSocket.IsConnected())
                 {
                     currentCount = ClientSocket.Close();
+                    IsConnected = false;
                 }
                 
             }

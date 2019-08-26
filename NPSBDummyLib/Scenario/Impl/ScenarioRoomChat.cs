@@ -5,13 +5,16 @@ using System.Threading.Tasks;
 
 namespace NPSBDummyLib
 {
-    public class ScenarioLogin : ScenarioBase
+    class ScenarioRoomChat : ScenarioBase
     {
         public override async Task<(bool, string)> TaskAsync(Dummy dummy, TestConfig config)
         {
             var connect = MakeActionFactory(TestCase.ACTION_CONNECT, config);
-            var disConnect = MakeActionFactory(TestCase.ACTION_DISCONNECT, config);
             var login = MakeActionFactory(TestCase.ACTION_LOGIN, config);
+            var roomEnter = MakeActionFactory(TestCase.ACTION_ROOM_ENTER, config);
+            var roomLeave = MakeActionFactory(TestCase.ACTION_ROOM_LEAVE, config);
+            var roomChat = MakeActionFactory(TestCase.ACTION_ROOM_CHAT, config);
+            var disConnect = MakeActionFactory(TestCase.ACTION_DISCONNECT, config);
 
             var repeatCount = 0;
             var testStartTime = DateTime.Now;
@@ -20,26 +23,45 @@ namespace NPSBDummyLib
             while (true)
             {
                 taskResult = await connect.Run(dummy);
-                if(taskResult.Item1 == false)
+                if (taskResult.Item1 == false)
                 {
                     // 실패 통보하면서 더미 실행 중지
-                    return (false, "fail Connect");
+                    return (false, taskResult.Item2);
                 }
-
 
                 taskResult = await login.Run(dummy);
                 if (taskResult.Item1 == false)
                 {
                     // 실패 통보하면서 더미 실행 중지
-                    return (false, "fail Login");
+                    return (false, taskResult.Item2);
+                }
+                
+                taskResult = await roomEnter.Run(dummy);
+                if (taskResult.Item1 == false)
+                {
+                    // 실패 통보하면서 더미 실행 중지
+                    return (false, taskResult.Item2);
                 }
 
+                taskResult = await roomChat.Run(dummy);
+                if (taskResult.Item1 == false)
+                {
+                    // 실패 통보하면서 더미 실행 중지
+                    return (false, taskResult.Item2);
+                }
+
+                taskResult = await roomLeave.Run(dummy);
+                if (taskResult.Item1 == false)
+                {
+                    // 실패 통보하면서 더미 실행 중지
+                    return (false, taskResult.Item2);
+                }
 
                 taskResult = await disConnect.Run(dummy);
                 if (taskResult.Item1 == false)
                 {
                     // 실패 통보하면서 더미 실행 중지
-                    return (false, "fail DisConnect");
+                    return (false, taskResult.Item2);
                 }
 
                 ++repeatCount;
@@ -49,10 +71,10 @@ namespace NPSBDummyLib
                 {
                     break;
                 }
-
             }
 
             return Utils.MakeResult(dummy.Index, true, "Success");
         }
     }
 }
+

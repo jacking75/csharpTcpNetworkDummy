@@ -66,33 +66,30 @@ namespace NPSBDummyLib
             TestResultMgr.Clear();
         }
 
-        public bool Prepare(TestConfig config)
+        public bool Prepare()
         {
-            Config = config;
-
-            switch (config.ActionCase)
+            if (!IsInProgress())
             {
-                case TestCase.ONLY_CONNECT:
-                case TestCase.REPEAT_CONNECT:
-                case TestCase.ECHO:
-                case TestCase.ACTION_CONNECT:
-                    if (!IsInProgress())
-                    {
-                        CurrentConnectingCount = 0;
-                        DummyList.Clear();
+                CurrentConnectingCount = 0;
+                DummyList.Clear();
 
-                        for (int i = 0; i < DummyManager.GetDummyInfo.DummyCount; ++i)
-                        {
-                            var dummy = new Dummy();
-                            dummy.Init(i, config);
-                            DummyList.Add(dummy);   
-                        }
-                        InProgress = true;
-                    }
-                    break;
+                for (int i = 0; i < DummyManager.GetDummyInfo.DummyCount; ++i)
+                {
+                    var dummy = new Dummy();
+                    dummy.Init(i);
+                    DummyList.Add(dummy);   
+                }
+                InProgress = true;
             }
 
             return true;
+        }
+
+        public void SetConfigure(TestConfig config)
+        {
+            config.IsConditionFunc = IsInProgress;
+            config.GetDummyFunc = GetDummy;
+            Config = config;
         }
 
         public static void EndProgress()

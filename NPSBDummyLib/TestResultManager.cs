@@ -17,7 +17,7 @@ namespace NPSBDummyLib
             PacketStatDic = new Dictionary<PACKETID, int>();
         }
 
-        public void AddTestResult(Int64 index, TestCase testType, List<Dummy> dummyList, DateTime startTime, List<Task<(int, bool, string)>> testResults = null)
+        public void AddTestResult(Int64 index, TestCase testType, List<Dummy> dummyList, DateTime startTime, List<Task<(bool, string)>> testResults = null)
         {
             var isExist = ResultDic.ContainsKey(index);
             var report = isExist ? ResultDic[index] : new TestResultReport();
@@ -61,7 +61,7 @@ namespace NPSBDummyLib
             
         }
 
-        public void AddDetailTestResult(Int64 index, List<Task<(int, bool, string)>> testResults)
+        public void AddDetailTestResult(Int64 index, List<Task<(bool, string)>> testResults)
         {
             var isExist = ResultDic.ContainsKey(index);
             var report = isExist ? ResultDic[index] : new TestResultReport();
@@ -138,9 +138,9 @@ namespace NPSBDummyLib
             StringBuilder resultMessage = new StringBuilder();
             foreach (var detailLog in report.DetailLog)
             {
-                (var index, var success, var message) = detailLog.Result;
-                var result = success ? "ok" : "failed";
-                resultMessage.Append($"Id:{index}, {message} => {result}\n");
+                (var success, var message) = detailLog.Result;
+                var result = success ? "" : " => failed";
+                resultMessage.Append($"{message}{result}\n");
             }
 
             return resultMessage.ToString();
@@ -193,10 +193,10 @@ namespace NPSBDummyLib
         public int DummyCount;
         public int SuccessCount;
         public int FailCount;
-        public List<Task<(int, bool, string)>> DetailLog;
+        public List<Task<(bool, string)>> DetailLog;
         public TestResultReport()
         {
-            DetailLog = new List<Task<(int, bool, string)>>();
+            DetailLog = new List<Task<(bool, string)>>();
         }
     }
 }

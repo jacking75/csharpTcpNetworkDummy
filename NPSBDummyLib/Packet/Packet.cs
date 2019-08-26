@@ -120,6 +120,11 @@ namespace NPSBDummyLib
             }
             return recvCount;
         }
+
+        public void Reset()
+        {
+            RemainLength = 0;
+        }
     }
 
     public class PacketToBytes
@@ -169,24 +174,23 @@ namespace NPSBDummyLib
             return (packetID, body);
         }
 
-        public static byte[] SplitPacketBuffer(int recvLength, RecvPacketInfo recvData)
+        public static void SplitPacketBuffer(int recvLength, RecvPacketInfo recvData, ObjectComponentPacket packetObj)
         {
             recvData.BufferSize = BitConverter.ToInt16(recvData.RecvBuffer, 0);
             recvData.BodySize = recvData.BufferSize - PacketDef.PACKET_HEADER_SIZE;
             if (recvData.BodySize <= 0)
             {
-                return null;
+                return;
             }
 
-            var packetBody = new byte[recvData.BodySize];
-            Buffer.BlockCopy(recvData.RecvBuffer, PacketDef.PACKET_HEADER_SIZE, packetBody, 0, recvData.BodySize);
+            //var packetBody = new byte[recvData.BodySize];
+            Buffer.BlockCopy(recvData.RecvBuffer, PacketDef.PACKET_HEADER_SIZE, packetObj.BodyBytes, 0, recvData.BodySize);
 
             if (recvLength > recvData.BufferSize)
             {
                 Buffer.BlockCopy(recvData.RecvBuffer, recvData.BufferSize, recvData.RecvBuffer, 0, recvLength - recvData.BufferSize);
             }
 
-            return packetBody;
         }
     }
 

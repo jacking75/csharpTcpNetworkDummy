@@ -8,13 +8,13 @@ namespace NPSBDummyLib
     public class TaskActionManager
     {
         List<ActionBase> ActionTaskList;
-        List<(int, bool, string)> ResultList;
+        List<(bool, string)> ResultList;
         Dummy Owner;
 
         public TaskActionManager(Dummy owner)
         {
             ActionTaskList = new List<ActionBase>();
-            ResultList = new List<(int, bool, string)>();
+            ResultList = new List<(bool, string)>();
             Owner = owner;
         }
 
@@ -69,7 +69,7 @@ namespace NPSBDummyLib
             }
         }
 
-        public List<(int, bool, string)> GetResultList()
+        public List<(bool, string)> GetResultList()
         {
             return ResultList;
         }
