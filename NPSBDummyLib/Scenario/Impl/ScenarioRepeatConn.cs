@@ -41,6 +41,11 @@ namespace NPSBDummyLib
                     break;
                 }
 
+                var elapsedTime = DateTime.Now - testStartTime;
+                if (elapsedTime.TotalMilliseconds > config.LimitActionTime)
+                {
+                    Utils.MakeResult(dummy.Index, false, "타임 아웃");
+                }
             }
 
             return Utils.MakeResult(dummy.Index, true, "Success");
