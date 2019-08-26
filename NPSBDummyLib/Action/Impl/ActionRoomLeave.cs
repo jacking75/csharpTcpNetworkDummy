@@ -7,8 +7,8 @@ namespace NPSBDummyLib
 {
     class ActionRoomLeave : ActionBase
     {
-        public ActionRoomLeave(DummyManager dummyMananger, TestConfig config) :
-            base(TestCase.ACTION_ROOM_LEAVE, dummyMananger, config)
+        public ActionRoomLeave(TestConfig config) :
+            base(TestCase.ACTION_ROOM_LEAVE, config)
         {
             RegistRecvFunc(PACKETID.RES_ROOM_LEAVE, CheckResRoomLeave, true);    
         }
@@ -18,7 +18,7 @@ namespace NPSBDummyLib
             return "RoomLeave";
         }
 
-        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy, TestConfig config)
+        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy)
         {
             var clientSocket = dummy.ClientSocket;
             try

@@ -37,18 +37,16 @@ namespace NPSBDummyLib
         {
             var tcs = new TaskCompletionSource<(EResultCode, PACKETID, byte[])>(TaskCreationOptions.RunContinuationsAsynchronously);
             tcs.SetResult(result);
-            await RecvResultChannel.Writer.WriteAsync(tcs).ConfigureAwait(false);
-            await tcs.Task.ConfigureAwait(false);
+            await RecvResultChannel.Writer.WriteAsync(tcs);
+            await tcs.Task;
         }
 
         public async Task<(EResultCode, PACKETID, byte[])> PopRecvResult(int limitActionTime)
         {
-            //TODO 최흥배 var를 자주 사용하고, 최신 C# 문법을 사용했으면 합니다
-            CancellationTokenSource cts = new CancellationTokenSource(limitActionTime);
-            await RecvResultChannel.Reader.WaitToReadAsync(cts.Token).ConfigureAwait(false);
+            var cts = new CancellationTokenSource(limitActionTime);
+            await RecvResultChannel.Reader.WaitToReadAsync(cts.Token);
 
-            TaskCompletionSource<(EResultCode, PACKETID, byte[])> resultTask;
-            if (!RecvResultChannel.Reader.TryRead(out resultTask))
+            if (!RecvResultChannel.Reader.TryRead(out var resultTask))
             {
                 return (EResultCode.RESULT_FAILED_POP_CHANNEL, 0, null);
             }

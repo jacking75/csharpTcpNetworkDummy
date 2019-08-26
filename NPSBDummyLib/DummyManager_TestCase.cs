@@ -30,32 +30,33 @@ namespace NPSBDummyLib
         public ActionBase MakeActionFactory(TestCase testType, TestConfig config)
         {
             config.IsConditionFunc = IsInProgress;
+            config.GetDummyFunc = GetDummy;
 
             ActionBase action = null;
             switch (testType)
             {
                 case TestCase.ACTION_CONNECT:
-                    action = new ActionConnect(this, config);
+                    action = new ActionConnect(config);
                     break;
 
                 case TestCase.ACTION_DISCONNECT:
-                    action = new ActionDisconnect(this, config);
+                    action = new ActionDisconnect(config);
                     break;
 
                 case TestCase.ACTION_LOGIN:
-                    action = new ActionLogin(this, config);
+                    action = new ActionLogin(config);
                     break;
 
                 case TestCase.ACTION_ROOM_ENTER:
-                    action = new ActionRoomEnter(this, config);
+                    action = new ActionRoomEnter(config);
                     break;
 
                 case TestCase.ACTION_ROOM_LEAVE:
-                    action = new ActionRoomLeave(this, config);
+                    action = new ActionRoomLeave(config);
                     break;
 
                 case TestCase.ACTION_ROOM_CHAT:
-                    action = new ActionRoomChat(this, config);
+                    action = new ActionRoomChat(config);
                     break;
 
                 default:
@@ -70,7 +71,6 @@ namespace NPSBDummyLib
             var testResults = new List<Task<(int, bool, string)>>();
             var actionList = new List<ActionBase>();
             var startTime = DateTime.Now;
-
 
             testResults.Capacity = DummyList.Count;
             actionList.Capacity = DummyList.Count;
@@ -89,7 +89,7 @@ namespace NPSBDummyLib
                 }
 
                 testResults.Add(Task<(int, bool, string)>.Run(() => {
-                    return action.Run(dummy, config);
+                    return action.Run(dummy);
                 }));
             }
 

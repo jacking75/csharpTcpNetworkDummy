@@ -7,8 +7,8 @@ namespace NPSBDummyLib
 {
     class ActionLogin : ActionBase
     {
-        public ActionLogin(DummyManager dummyMananger, TestConfig config) : 
-            base(TestCase.ACTION_LOGIN, dummyMananger, config)
+        public ActionLogin(TestConfig config) : 
+            base(TestCase.ACTION_LOGIN, config)
         {
             RegistRecvFunc(PACKETID.RES_LOGIN, CheckResLogin, true);
         }
@@ -18,7 +18,7 @@ namespace NPSBDummyLib
             return "Login";
         }
 
-        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy, TestConfig config)
+        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy)
         {
             var clientSocket = dummy.ClientSocket;
             try
@@ -56,7 +56,6 @@ namespace NPSBDummyLib
             if ((ERROR_CODE)body.Result != ERROR_CODE.NONE)
             {
                 return (dummy.Index, false, $"결과값 틀림({body.Result})");
-               
             }
 
             return (dummy.Index, true, "");

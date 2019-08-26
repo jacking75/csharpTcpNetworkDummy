@@ -7,11 +7,6 @@ namespace NPSBDummyLib
 {
     public class TestConfig
     {
-        //public string RmoteIP;
-        //public int RemotePort;
-
-        //public int DummyCount;
-        //public int PacketSizeMax;
         public int RoomNumber;                 // 방번호
 
         public Int64 RepeatConnectCount;       // 지정 값만큼 접속 후 끊기 반복
@@ -21,10 +16,12 @@ namespace NPSBDummyLib
         public Int32 ActionIntervalTime;       // 액션간 간격 시간(ms)
         public Int32 ActionRepeatCount;        // 액션 반복 횟수
         public Int32 DummyIntervalTime;        // 더미간 실행 간격(ms)
-      
+        public int DummyCount;
         public int MaxVaildActionRecvCount;    // recv시 유효한 action 최대 수
         public string ChatMessage;             // 채팅 메시지
         public Func<bool> IsConditionFunc;
+        public Func<int, Dummy> GetDummyFunc;
+
         public Int64 TestUniqueId;
         public TestCase ActionCase;
 

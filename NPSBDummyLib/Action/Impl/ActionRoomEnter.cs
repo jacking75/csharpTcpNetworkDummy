@@ -9,8 +9,8 @@ namespace NPSBDummyLib
     {
         public int RoomNumber { get; private set; }
         
-        public ActionRoomEnter(DummyManager dummyMananger, TestConfig config) :
-            base(TestCase.ACTION_ROOM_ENTER, dummyMananger, config)
+        public ActionRoomEnter(TestConfig config) :
+            base(TestCase.ACTION_ROOM_ENTER, config)
         {
             RegistRecvFunc(PACKETID.RES_ROOM_ENTER, CheckResRoomEnter, true);
         }
@@ -20,17 +20,17 @@ namespace NPSBDummyLib
             return "RoomEnter";
         }
 
-        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy, TestConfig config)
+        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy)
         {
             var clientSocket = dummy.ClientSocket;
             try
             {
                 // 스레드 잘 사용하는지 알기 위해 스레드 번호찍기
                 //Utils.Logger.Debug($"Echo-Send. ClientIndex: {dummy.Index}");
-                RoomNumber = config.RoomNumber;
+                RoomNumber = TestConfig.RoomNumber;
                 var packet = new PKTReqRoomEnter()
                 {
-                    RoomNumber = config.RoomNumber,
+                    RoomNumber = TestConfig.RoomNumber,
                 };
 
                 var sendData = PacketToBytes.Make(PACKETID.REQ_ROOM_ENTER, packet);

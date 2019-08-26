@@ -5,8 +5,8 @@ namespace NPSBDummyLib
 {
     internal class ActionDisconnect : ActionBase
     {
-        public ActionDisconnect(DummyManager dummyManager, TestConfig config) :
-            base(TestCase.ACTION_DISCONNECT, dummyManager, config)
+        public ActionDisconnect(TestConfig config) :
+            base(TestCase.ACTION_DISCONNECT, config)
         {
         }
 
@@ -15,10 +15,9 @@ namespace NPSBDummyLib
             return "Disconnect";
         }
 
-        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy, TestConfig config)
+        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy)
         {
             var currentCount = await Task.Run<Int64>(() => {
-
                 var result = dummy.DisConnect();
                 return result;
 
@@ -28,6 +27,5 @@ namespace NPSBDummyLib
             return (dummy.Index, true, $"Connected dummy count : {currentCount}");
 
         }
-
     }
 }

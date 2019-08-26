@@ -285,9 +285,7 @@ namespace TcpDummyClient
 
             while (true)
             {
-                ReportData report;
-
-                if (logMsgQueue.TryDequeue(out report) == false)
+                if (logMsgQueue.TryDequeue(out var report) == false)
                 {
                     break;
                 }
@@ -309,7 +307,6 @@ namespace TcpDummyClient
                 }
             }
         }
-
 
         private async void buttonStartAction_Click(object sender, EventArgs e)
         {

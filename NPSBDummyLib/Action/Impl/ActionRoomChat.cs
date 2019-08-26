@@ -9,8 +9,8 @@ namespace NPSBDummyLib
     {
         public string ChatMessage { get; private set; }
 
-        public ActionRoomChat(DummyManager dummyMananger, TestConfig config) :
-            base(TestCase.ACTION_ROOM_CHAT, dummyMananger, config)
+        public ActionRoomChat(TestConfig config) :
+            base(TestCase.ACTION_ROOM_CHAT, config)
         {
         }
 
@@ -19,7 +19,7 @@ namespace NPSBDummyLib
             return "RoomChat";
         }
 
-        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy, TestConfig config)
+        protected override async Task<(int, bool, string)> TaskAsync(Dummy dummy)
         {
             var clientSocket = dummy.ClientSocket;
             try
@@ -27,10 +27,10 @@ namespace NPSBDummyLib
                 // 스레드 잘 사용하는지 알기 위해 스레드 번호찍기
                 //Utils.Logger.Debug($"Echo-Send. ClientIndex: {dummy.Index}");
 
-                ChatMessage = string.Copy(config.ChatMessage);
+                ChatMessage = string.Copy(TestConfig.ChatMessage);
                 var packet = new PKTReqRoomChat()
                 {
-                    ChatMessage = config.ChatMessage,
+                    ChatMessage = TestConfig.ChatMessage,
                 };
 
                 var sendData = PacketToBytes.Make(PACKETID.REQ_ROOM_CHAT, packet);

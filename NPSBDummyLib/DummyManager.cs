@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace NPSBDummyLib
 {
@@ -94,7 +95,7 @@ namespace NPSBDummyLib
             return true;
         }
 
-        public void EndProgress()
+        public static void EndProgress()
         {
             InProgress = false;
         }
@@ -144,6 +145,39 @@ namespace NPSBDummyLib
         public TestCase CurrentTestCase()
         {
             return Config.ActionCase;
+        }
+
+        public bool AddTaskAction(int dummyIndex, TestCase testCase, TestConfig config)
+        {
+            var dummy = GetDummy(dummyIndex);
+            if (dummy == null)
+            {
+                return false;
+            }
+
+            dummy.TaskMgr.AddTask(testCase, config);
+            return true;
+        }
+
+        public async Task TaskStartAndWaitUntilTheEnd(TestConfig config)
+        {
+            var testUniqueId = config.TestUniqueId;
+            var testResults = new List<Task>();
+            var startTime = DateTime.Now;
+
+            for (int i = 0; i < DummyList.Count; ++i)
+            {
+                var dummy = DummyList[i];
+
+                // 더미간에는 비동기적으로 액션 처리
+                testResults.Add(Task.Run(async () => {
+                    await dummy.TaskMgr.RunAsync();
+                }));
+            }
+
+            await Task.WhenAll(testResults.ToArray());
+
+            TestResultMgr.AddTestResult(testUniqueId, config.ActionCase, DummyList, startTime);
         }
 
 

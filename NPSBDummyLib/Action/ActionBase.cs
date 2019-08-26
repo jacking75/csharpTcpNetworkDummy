@@ -15,15 +15,12 @@ namespace NPSBDummyLib
         public TestConfig TestConfig { get; private set; }
 
         public HashSet<PACKETID> CheckPacketIDSet = new HashSet<PACKETID>();
-        protected DummyManager DummyManager; //TODO 최흥배 DummyManager 객체를 가질 필요가 없을 것 같습니다. 필요한 함수만 전달하는 것으로 했으면 합니다.
         protected Dictionary<PACKETID, RecvFunc> RecvFuncDic = new Dictionary<PACKETID, RecvFunc>();
 
-        public ActionBase(TestCase testType, DummyManager dummyManager, TestConfig config)
+        public ActionBase(TestCase testType, TestConfig config)
         {
             TestType = testType;
-            DummyManager = dummyManager;
             TestConfig = config;
-
             RegistCommonPacket();
         }
 
@@ -46,16 +43,17 @@ namespace NPSBDummyLib
             RegistRecvFunc(packetId, func, false);
         }
 
-
         public RecvFunc GetRecvFunction(PACKETID packetId)
         {
-            RecvFunc func = null;
             if (CheckPacketIDSet.Contains(packetId))
             {
                 CheckPacketIDSet.Remove(packetId);
             }
 
-            RecvFuncDic.TryGetValue(packetId, out func);
+            if (!RecvFuncDic.TryGetValue(packetId, out var func))
+            {
+                func = null;
+            }
             return func;
         }
 
@@ -65,10 +63,10 @@ namespace NPSBDummyLib
         }
 
 
-        async public Task<(int, bool, string)> Run(Dummy dummy, TestConfig config)
+        async public Task<(int, bool, string)> Run(Dummy dummy)
         {
             // 여기에 perf 관련 데이터 추가
-            var result = await TaskAsync(dummy, config);
+            var result = await TaskAsync(dummy);
 
             return result;
         }
@@ -103,7 +101,7 @@ namespace NPSBDummyLib
             return (dummy.Index, result, log);
         }
 
-        protected virtual async Task<(int, bool, string)> TaskAsync(Dummy dummy, TestConfig config)
+        protected virtual async Task<(int, bool, string)> TaskAsync(Dummy dummy)
         {
             return await Task.Run<(int, bool, string)>(() =>
             {
@@ -124,7 +122,7 @@ namespace NPSBDummyLib
             do
             {
                 var recvResult = await dummy.PopRecvResult(TestConfig.LimitActionTime);
-                (EResultCode errorCode, PACKETID packetId, byte[] packetBuffer) = recvResult;
+                (var errorCode, var packetId, var packetBuffer) = recvResult;
 
                 if (expectTime < DateTime.Now)
                 {

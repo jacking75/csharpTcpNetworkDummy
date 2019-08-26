@@ -27,7 +27,7 @@ namespace NPSBDummyLib
         public (int, bool, string) CheckNtfRoomNewUser(Dummy dummy, PACKETID packetId, byte[] packetBuffer)
         {
             var body = MessagePackSerializer.Deserialize<PKTNtfRoomNewUser>(packetBuffer);
-            var sender = DummyManager.GetDummy(dummy.Index);
+            var sender = TestConfig.GetDummyFunc(dummy.Index);
             if (sender == null)
             {
                 return (dummy.Index, false, $"해당 sender가 존재하지 않음({dummy.Index})");
@@ -58,6 +58,5 @@ namespace NPSBDummyLib
 
             return (dummy.Index, true, "");
         }
-
     }
 }

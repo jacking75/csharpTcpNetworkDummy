@@ -65,7 +65,6 @@ namespace NPSBDummyLib
                         return End(dummy, curEchoCount, false, "데이터 틀림");
                     }
 
-
                     ++curEchoCount;
 
                     if (cond.IsEnd(curEchoCount))
@@ -84,7 +83,7 @@ namespace NPSBDummyLib
 
         public (bool,string) End(Dummy dummy, Int32 actionCount, bool result, string message)
         {
-            if(result)
+            if (result)
             {
                 dummy.SetSuccess(true);
             }
@@ -113,7 +112,7 @@ namespace NPSBDummyLib
 
         public void Set(int echoCount, int echoTiimeSecond)
         {
-            if(echoTiimeSecond == 0)
+            if (echoTiimeSecond == 0)
             {
                 EchoCount = echoCount;
             }
@@ -143,5 +142,4 @@ namespace NPSBDummyLib
             return false;
         }
     }
-
 }
