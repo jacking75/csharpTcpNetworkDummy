@@ -103,6 +103,7 @@ namespace NPSBDummyLib
             }
         }
 
+        //TODO 아래 로그인 테스트처럼 변경하자
         public async Task TestConnectOnlyAsync(Int64 testUniqueId)
         {
             var startTime = DateTime.Now;
@@ -119,6 +120,7 @@ namespace NPSBDummyLib
             TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList, startTime);
         }
 
+        //TODO 아래 로그인 테스트처럼 변경하자
         public async Task TestRepeatConnectAsync(Int64 testUniqueId)
         {
             var startTime = DateTime.Now;
@@ -135,6 +137,7 @@ namespace NPSBDummyLib
             TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList, startTime);
         }
 
+        //TODO 아래 로그인 테스트처럼 변경하자
         public async Task TestRepeatEchoAsync(Int64 testUniqueId, EchoCondition echoCondi)
         {
             var startTime = DateTime.Now;
@@ -152,6 +155,38 @@ namespace NPSBDummyLib
             await Task.WhenAll(testResults.ToArray());
 
             TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList, startTime);
+        }
+
+
+        public async Task TestLoginAsync(Int64 testUniqueId, TestConfig config)
+        {
+            await RunTestScenario(testUniqueId, config, DummyList, AddDummyScenarioLogin);            
+        }
+
+
+        async Task RunTestScenario(Int64 testUniqueId, TestConfig config, List<Dummy> dummyList, Action<List<Task<(bool, string)>> , Dummy, Int64, TestConfig> scenarioTask)
+        {
+            var startTime = DateTime.Now;
+            var testResults = new List<Task<(bool, string)>>();
+
+            for (int i = 0; i < dummyList.Count; ++i)
+            {
+                var dummy = dummyList[i];
+                scenarioTask(testResults, dummy, testUniqueId, config);
+            }
+
+            await Task.WhenAll(testResults.ToArray());
+
+            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList, startTime);
+        }
+
+        void AddDummyScenarioLogin(List<Task<(bool, string)>> results, Dummy dummy, Int64 testUniqueId, TestConfig config)
+        {
+            results.Add(Task<(bool, string)>.Run(async () => {
+
+                var scenario = new ScenarioLogin();
+                return await scenario.TaskAsync(dummy, config);
+            }));
         }
     }
 }

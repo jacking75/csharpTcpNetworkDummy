@@ -237,10 +237,16 @@ namespace TcpDummyClient
 
         #region Test
         // Test 로그인
-        private void button5_Click(object sender, EventArgs e)
+        private async void button5_Click(object sender, EventArgs e)
         {
+            var testUniqueIndex = DateTime.Now.Ticks;
             var config = GetTestBaseConfig();
-            listBoxAction.Items.Add(new ActionData(TestCase.ACTION_LOGIN, "로그인", config));
+
+            DummyManager.Prepare(config);           
+            await DummyManager.TestLoginAsync(testUniqueIndex, config);
+
+            testResultToUILog(testUniqueIndex, config);            
+            DummyManager.EndTest();
         }
 
         // Test 액션 모두 삭제

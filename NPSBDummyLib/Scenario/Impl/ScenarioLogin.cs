@@ -7,18 +7,61 @@ namespace NPSBDummyLib
 {
     public class ScenarioLogin : ScenarioBase
     {
-        public override async Task TaskAsync(Dummy dummy, TestConfig config)
+        public override async Task<(bool, string)> TaskAsync(Dummy dummy, TestConfig config)
         {
             var connect = MakeActionFactory(TestCase.ACTION_CONNECT, config);
+            var disConnect = MakeActionFactory(TestCase.ACTION_DISCONNECT, config);
             var login = MakeActionFactory(TestCase.ACTION_LOGIN, config);
 
-            ResultList.Add(await connect.Run(dummy));
+            var repeatCount = 0;
+            var testStartTime = DateTime.Now;
+            (int, bool, string) taskResult;
 
-            //await Task.Delay(config.ActionIntervalTime);
+            while (true)
+            {
+                taskResult = await connect.Run(dummy);
+                if(taskResult.Item2 == false)
+                {
+                    // 실패 통보하면서 더미 실행 중지
+                    return (false, "fail Connect");
+                }
 
-            ResultList.Add(await login.Run(dummy));
+
+                taskResult = await login.Run(dummy);
+                if (taskResult.Item2 == false)
+                {
+                    // 실패 통보하면서 더미 실행 중지
+                    return (false, "fail Login");
+                }
 
 
+                taskResult = await disConnect.Run(dummy);
+                if (taskResult.Item2 == false)
+                {
+                    // 실패 통보하면서 더미 실행 중지
+                    return (false, "fail DisConnect");
+                }
+
+                ++repeatCount;
+
+                // 테스트 조건 검사
+                
+
+            }
+
+            return (true, "Success");
         }
+        //public override async Task TaskAsync(Dummy dummy, TestConfig config)
+        //{
+
+        //    var connect = MakeActionFactory(TestCase.ACTION_CONNECT, config);
+        //    var login = MakeActionFactory(TestCase.ACTION_LOGIN, config);
+
+        //    ResultList.Add(await connect.Run(dummy));
+
+        //    //await Task.Delay(config.ActionIntervalTime);
+
+        //    ResultList.Add(await login.Run(dummy));
+        //}
     }
 }

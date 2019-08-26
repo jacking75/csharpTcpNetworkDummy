@@ -64,6 +64,6 @@ namespace NPSBDummyLib
             return ResultList;
         }
 
-        public abstract Task TaskAsync(Dummy dummy, TestConfig config);
+        public abstract Task<(bool, string)> TaskAsync(Dummy dummy, TestConfig config);
     }
 }
