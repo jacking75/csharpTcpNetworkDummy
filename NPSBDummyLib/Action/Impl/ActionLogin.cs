@@ -26,6 +26,7 @@ namespace NPSBDummyLib
                 // 스레드 잘 사용하는지 알기 위해 스레드 번호찍기
                 //Utils.Logger.Debug($"Echo-Send. ClientIndex: {dummy.Index}");
 
+                
                 var packet = new PKTReqLogin()
                 {
                     UserID = dummy.GetUserID(),

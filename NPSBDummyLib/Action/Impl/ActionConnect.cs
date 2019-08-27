@@ -17,7 +17,6 @@ namespace NPSBDummyLib
 
         protected override async Task<(bool, string)> TaskAsync(Dummy dummy)
         {
-            
             var result = await dummy.ConnectAsyncAndReTry(DummyManager.GetDummyInfo.RmoteIP, DummyManager.GetDummyInfo.RemotePort);
             if (result.Result == false)
             {

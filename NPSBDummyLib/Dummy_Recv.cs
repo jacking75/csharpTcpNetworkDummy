@@ -12,7 +12,7 @@ namespace NPSBDummyLib
     {
         Task WorkerThread;
         Dictionary<PACKETID, int> PacketStatDic = new Dictionary<PACKETID, int>();
-        Channel<TaskCompletionSource<ObjectComponentPacket>> RecvResultChannel = Channel.CreateUnbounded<TaskCompletionSource<ObjectComponentPacket>>();
+        Channel<TaskCompletionSource<(EResultCode, PACKETID, byte[])>> RecvResultChannel = Channel.CreateUnbounded<TaskCompletionSource<(EResultCode, PACKETID, byte[])>>();
 
         public void IncreasePacket(PACKETID packetId)
         {
@@ -33,24 +33,22 @@ namespace NPSBDummyLib
             return result;
         }
 
-        public async Task EnqueueResult(ObjectComponentPacket result)
+        public async Task EnqueueResult((EResultCode, PACKETID, byte[]) result)
         {
-            var tcs = new TaskCompletionSource<ObjectComponentPacket>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var tcs = new TaskCompletionSource<(EResultCode, PACKETID, byte[])>(TaskCreationOptions.RunContinuationsAsynchronously);
             tcs.SetResult(result);
             await RecvResultChannel.Writer.WriteAsync(tcs);
             await tcs.Task;
         }
 
-        public async Task<ObjectComponentPacket> PopRecvResult(int limitActionTime)
+        public async Task<(EResultCode, PACKETID, byte[])> PopRecvResult(int limitActionTime)
         {
             var cts = new CancellationTokenSource(limitActionTime);
             await RecvResultChannel.Reader.WaitToReadAsync(cts.Token);
 
             if (!RecvResultChannel.Reader.TryRead(out var resultTask))
             {
-                var packetObj = ObjectPool<ObjectComponentPacket>.GetInstance.Get();
-                packetObj.ResultCode = EResultCode.RESULT_FAILED_POP_CHANNEL;
-                return packetObj;
+                return (EResultCode.RESULT_FAILED_POP_CHANNEL, 0, null);
             }
 
             return resultTask.Task.Result;
@@ -60,6 +58,7 @@ namespace NPSBDummyLib
         {
             WorkerThread = Task.Run(async () => {
                 IsRecvWorkerThread = true;
+
                 while (IsRecvWorkerThread)
                 {
                     var (recvCount, recvError) = await ClientSocket.ReceiveAsync(RecvPacket.BufferSize, RecvPacket.RecvBuffer);
@@ -90,26 +89,19 @@ namespace NPSBDummyLib
                 RecvEndCond.Set();
                 if (DummyManager.IsInProgress())
                 {
-                    var packetObj = ObjectPool<ObjectComponentPacket>.GetInstance.Get();
-                    packetObj.ResultCode = EResultCode.RESULT_RECV_ERROR;
-                    await EnqueueResult(packetObj);
+                    await EnqueueResult((EResultCode.RESULT_RECV_ERROR, 0, null));
                     return false;
                 }
                 else
                 {
-                    var packetObj = ObjectPool<ObjectComponentPacket>.GetInstance.Get();
-                    packetObj.ResultCode = EResultCode.RESULT_OK;
-                    await EnqueueResult(packetObj);
+                    await EnqueueResult((EResultCode.RESULT_OK, 0, null));
                     return false;
                 }
             }
 
             if (recvCount == 0)
             {
-                var packetObj = ObjectPool<ObjectComponentPacket>.GetInstance.Get();
-                packetObj.ResultCode = EResultCode.RESULT_CONNECTION_EXPIRED;
-                packetObj.PacketId = PACKETID.CS_END;
-                await EnqueueResult(packetObj);
+                await EnqueueResult((EResultCode.RESULT_CONNECTION_EXPIRED, PACKETID.CS_END, null));
                 return false;
             }
 
@@ -119,15 +111,11 @@ namespace NPSBDummyLib
 
             while (recvCount >= (packetSize = BitConverter.ToInt16(RecvPacket.RecvBuffer, 0)))
             {
-                var packetObj = ObjectPool<ObjectComponentPacket>.GetInstance.Get();
-                packetObj.ResultCode = EResultCode.RESULT_OK;
-                packetObj.PacketId = (PACKETID)BitConverter.ToInt16(RecvPacket.RecvBuffer, 2);
-                PacketToBytes.SplitPacketBuffer(recvCount, RecvPacket, packetObj);
+                var packetId = (PACKETID)BitConverter.ToInt16(RecvPacket.RecvBuffer, 2);
+                var body = PacketToBytes.SplitPacketBuffer(recvCount, RecvPacket);
+                await EnqueueResult((EResultCode.RESULT_OK, packetId, body));
 
-
-                await EnqueueResult(packetObj);
-
-                IncreasePacket(packetObj.PacketId);
+                IncreasePacket(packetId);
                 recvCount -= packetSize;
             }
 

@@ -35,7 +35,6 @@ namespace TcpDummyClient
         void Init()
         {
             DummyManager.LogFunc = AddLog;
-
             logMsgQueue = new System.Collections.Concurrent.ConcurrentQueue<ReportData>();
 
             dispatcherUITimer = new System.Windows.Threading.DispatcherTimer();
@@ -428,6 +427,7 @@ namespace TcpDummyClient
             var testUniqueIndex = DateTime.Now.Ticks;
             var config = GetTestBaseConfig();
             DummyManager.SetDummyInfo = GetBaseDummyInfo();
+            DummyManager.Init();
 
             DummyManager.Prepare();
             await DummyManager.TestLoginAsync(testUniqueIndex, config);
@@ -441,6 +441,7 @@ namespace TcpDummyClient
             var testUniqueIndex = DateTime.Now.Ticks;
             var config = GetTestBaseConfig();
             DummyManager.SetDummyInfo = GetBaseDummyInfo();
+            DummyManager.Init();
 
             DummyManager.Prepare();
             await DummyManager.TestRepeatConnAsync(testUniqueIndex, config);
@@ -454,6 +455,7 @@ namespace TcpDummyClient
             var testUniqueIndex = DateTime.Now.Ticks;
             var config = GetTestBaseConfig();
             DummyManager.SetDummyInfo = GetBaseDummyInfo();
+            DummyManager.Init();
 
             DummyManager.Prepare();
             await DummyManager.TestRoomChatAsync(testUniqueIndex, config);

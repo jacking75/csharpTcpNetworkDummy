@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dotnet.Script.Core" Version="0.30.0" />
     <PackageReference Include="MessagePack" Version="1.7.3.7" />
     <PackageReference Include="NLog.Extensions.Logging" Version="1.5.2" />
     <PackageReference Include="System.Linq" Version="4.3.0" />

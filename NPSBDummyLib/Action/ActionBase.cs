@@ -135,38 +135,32 @@ namespace NPSBDummyLib
             do
             {
                 var recvResult = await dummy.PopRecvResult(TestConfig.LimitActionTime);
-                var errorCode = recvResult.ResultCode;
-                var packetId = recvResult.PacketId;
-                var packetBuffer = recvResult.BodyBytes;
-                
-                using (recvResult)
+                (var errorCode, var packetId, var packetBuffer) = recvResult;
+
+                if (expectTime < DateTime.Now)
                 {
-                    if (expectTime < DateTime.Now)
-                    {
-                        return End(dummy, false, "시간 초과");
-                    }
-
-                    var func = GetRecvFunction(packetId);
-                    if (func == null)
-                    {
-                        if (errorCode != EResultCode.RESULT_OK)
-                        {
-                            return End(dummy, false, $"에러 발생:{errorCode}");
-                        }
-
-                        return End(dummy, false, $"유효하지 않은 패킷({packetId})");
-                    }
-
-                    if (DummyManager.GetDummyInfo.IsRecvDetailProc || errorCode != EResultCode.RESULT_OK)
-                    {
-                        var (result, message) = func(dummy, packetId, packetBuffer);
-                        if (!result)
-                        {
-                            return End(dummy, false, message);
-                        }
-                    }
+                    return End(dummy, false, "시간 초과");
                 }
 
+                var func = GetRecvFunction(packetId);
+                if (func == null)
+                {
+                    if (errorCode != EResultCode.RESULT_OK)
+                    {
+                        return End(dummy, false, $"에러 발생:{errorCode}");
+                    }
+
+                    return End(dummy, false, $"유효하지 않은 패킷({packetId})");
+                }
+
+                if (DummyManager.GetDummyInfo.IsRecvDetailProc || errorCode != EResultCode.RESULT_OK)
+                {
+                    var (result, message) = func(dummy, packetId, packetBuffer);
+                    if (!result)
+                    {
+                        return End(dummy, false, message);
+                    }
+                }    
             } while (!IsCompleteRecv());
 
             return End(dummy, true, "ok");
