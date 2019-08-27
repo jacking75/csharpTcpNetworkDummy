@@ -77,9 +77,14 @@ namespace NPSBDummyLib
             return sf.GetMethod().Name;
         }
 
-        public static (bool, string) MakeResult(int dummyIndex, bool result, string message)
+        public static (bool, string) MakeResult(int dummyIndex, bool result, string message, ActionBase action = null)
         {
-            return (result, $"DummyIndex:{dummyIndex}, Message:{message}");
+            if (action == null)
+            {
+                return (result, $"DummyIndex:{dummyIndex}, {message}");
+            }
+            
+            return (result, $"DummyIndex:{dummyIndex}, [{action.GetActionName()}]{message}");
         }
     }
 }

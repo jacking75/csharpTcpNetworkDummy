@@ -46,7 +46,7 @@ namespace NPSBDummyLib
             }
             catch (Exception ex)
             {
-                return Utils.MakeResult(dummy.Index, false, ex.ToString());
+                return Utils.MakeResult(dummy.Index, false, ex.ToString(), this);
             }
         }
 
@@ -55,7 +55,7 @@ namespace NPSBDummyLib
             var body = MessagePackSerializer.Deserialize<PKTNtfRoomChat>(packetBuffer);
             if (body.ChatMessage != ChatMessage)
             {
-                return Utils.MakeResult(dummy.Index, false, $"메시지 다름({body.ChatMessage})");
+                return Utils.MakeResult(dummy.Index, false, $"메시지 다름({body.ChatMessage})", this);
             }
 
             return Utils.MakeResult(dummy.Index, true, "");

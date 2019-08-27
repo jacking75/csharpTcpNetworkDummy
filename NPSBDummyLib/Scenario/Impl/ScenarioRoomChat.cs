@@ -7,6 +7,11 @@ namespace NPSBDummyLib
 {
     class ScenarioRoomChat : ScenarioBase
     {
+        public override string GetScenarioName()
+        {
+            return "RoomChat";
+        }
+
         public override async Task<(bool, string)> TaskAsync(Dummy dummy, TestConfig config)
         {
             var connect = MakeActionFactory(TestCase.ACTION_CONNECT, config);

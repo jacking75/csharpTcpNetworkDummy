@@ -22,6 +22,8 @@ namespace NPSBDummyLib
         ACTION_ROOM_ENTER = 103,
         ACTION_ROOM_LEAVE = 104,
         ACTION_ROOM_CHAT = 105,
+        ACTION_ONLY_CONNECT = 106,
+        ACTION_ONLY_DISCONNECT = 107,
     }
 
 

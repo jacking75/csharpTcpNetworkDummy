@@ -7,6 +7,11 @@ namespace NPSBDummyLib
 {
     public class ScenarioLogin : ScenarioBase
     {
+        public override string GetScenarioName()
+        {
+            return "LoginOut";
+        }
+
         public override async Task<(bool, string)> TaskAsync(Dummy dummy, TestConfig config)
         {
             var connect = MakeActionFactory(TestCase.ACTION_CONNECT, config);
@@ -23,7 +28,7 @@ namespace NPSBDummyLib
                 if(taskResult.Item1 == false)
                 {
                     // 실패 통보하면서 더미 실행 중지
-                    return (false, "fail Connect");
+                    return (false, taskResult.Item2);
                 }
 
 
@@ -31,7 +36,7 @@ namespace NPSBDummyLib
                 if (taskResult.Item1 == false)
                 {
                     // 실패 통보하면서 더미 실행 중지
-                    return (false, "fail Login");
+                    return (false, taskResult.Item2);
                 }
 
 
@@ -39,7 +44,7 @@ namespace NPSBDummyLib
                 if (taskResult.Item1 == false)
                 {
                     // 실패 통보하면서 더미 실행 중지
-                    return (false, "fail DisConnect");
+                    return (false, taskResult.Item2);
                 }
 
                 ++repeatCount;

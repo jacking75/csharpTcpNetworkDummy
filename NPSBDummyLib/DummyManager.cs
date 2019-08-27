@@ -144,39 +144,6 @@ namespace NPSBDummyLib
             return Config.ActionCase;
         }
 
-        public bool AddTaskAction(int dummyIndex, TestCase testCase, TestConfig config)
-        {
-            var dummy = GetDummy(dummyIndex);
-            if (dummy == null)
-            {
-                return false;
-            }
-
-            dummy.TaskMgr.AddTask(testCase, config);
-            return true;
-        }
-
-        public async Task TaskStartAndWaitUntilTheEnd(TestConfig config)
-        {
-            var testUniqueId = config.TestUniqueId;
-            var testResults = new List<Task>();
-            var startTime = DateTime.Now;
-
-            for (int i = 0; i < DummyList.Count; ++i)
-            {
-                var dummy = DummyList[i];
-
-                // 더미간에는 비동기적으로 액션 처리
-                testResults.Add(Task.Run(async () => {
-                    await dummy.TaskMgr.RunAsync();
-                }));
-            }
-
-            await Task.WhenAll(testResults.ToArray());
-
-            TestResultMgr.AddTestResult(testUniqueId, config.ActionCase, DummyList, startTime);
-        }
-
 
         // Host 프로그램에 메시지를 보낼 큐 혹은 델리게이트. 에러, 로그, 결과를 보냄
         // Host 프로그램에서 메시지를 받을 큐 혹은 델리게이트. 중단 메시지를 받음

@@ -26,8 +26,16 @@ namespace NPSBDummyLib
                     action = new ActionConnect(config);
                     break;
 
+                case TestCase.ACTION_ONLY_CONNECT:
+                    action = new ActionOnlyConnect(config);
+                    break;
+
                 case TestCase.ACTION_DISCONNECT:
                     action = new ActionDisconnect(config);
+                    break;
+
+                case TestCase.ACTION_ONLY_DISCONNECT:
+                    action = new ActionOnlyDisconnect(config);
                     break;
 
                 case TestCase.ACTION_LOGIN:
@@ -65,5 +73,7 @@ namespace NPSBDummyLib
         }
 
         public abstract Task<(bool, string)> TaskAsync(Dummy dummy, TestConfig config);
+
+        public abstract string GetScenarioName();
     }
 }

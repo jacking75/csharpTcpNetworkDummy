@@ -37,7 +37,7 @@ namespace NPSBDummyLib
             try
             {
                 var stream = Client.GetStream();
-                var length = await stream.ReadAsync(buffer, 0, bufferSize);//.ConfigureAwait(false);
+                var length = await stream.ReadAsync(buffer, 0, bufferSize);
                 return (length, "");
                 //using (var stream = Client.GetStream())
                 //{
@@ -107,7 +107,8 @@ namespace NPSBDummyLib
 
             try
             {
-                Client.Close();                
+                //Client.Close();
+                Client.Client.Disconnect(true);
             }
             catch(Exception ex)
             {

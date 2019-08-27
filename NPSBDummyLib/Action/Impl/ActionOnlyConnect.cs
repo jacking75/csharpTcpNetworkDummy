@@ -3,21 +3,21 @@ using System.Threading.Tasks;
 
 namespace NPSBDummyLib
 {
-    internal class ActionConnect : ActionBase
+    internal class ActionOnlyConnect : ActionBase
     {
-        public ActionConnect(TestConfig config) :
-            base(TestCase.ACTION_CONNECT, config)
+        public ActionOnlyConnect(TestConfig config) :
+            base(TestCase.ACTION_ONLY_CONNECT, config)
         {
         }
 
         public override string GetActionName()
         {
-            return "Connect";
+            return "OnlyConnect";
         }
 
         protected override async Task<(bool, string)> TaskAsync(Dummy dummy)
         {
-            
+
             var result = await dummy.ConnectAsyncAndReTry(DummyManager.GetDummyInfo.RmoteIP, DummyManager.GetDummyInfo.RemotePort);
             if (result.Result == false)
             {
@@ -26,7 +26,6 @@ namespace NPSBDummyLib
             else
             {
                 dummy.Connected();
-                dummy.CreateRecvWorker();
             }
 
             dummy.SetSuccess(true);

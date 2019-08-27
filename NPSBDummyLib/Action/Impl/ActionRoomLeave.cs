@@ -39,7 +39,7 @@ namespace NPSBDummyLib
             }
             catch (Exception ex)
             {
-                return Utils.MakeResult(dummy.Index, false, ex.ToString());
+                return Utils.MakeResult(dummy.Index, false, ex.ToString(), this);
             }
         }
 
@@ -49,7 +49,7 @@ namespace NPSBDummyLib
             var body = MessagePackSerializer.Deserialize<PKTResRoomLeave>(packetBuffer);
             if ((ERROR_CODE)body.Result != ERROR_CODE.NONE)
             {
-                return Utils.MakeResult(dummy.Index, false, $"결과값 틀림({body.Result})");
+                return Utils.MakeResult(dummy.Index, false, $"결과값 틀림({body.Result})", this);
             }
 
             dummy.RoomNumber = 0;

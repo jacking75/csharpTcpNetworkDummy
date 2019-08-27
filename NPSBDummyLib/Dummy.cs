@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NPSBDummyLib
@@ -10,12 +11,12 @@ namespace NPSBDummyLib
 
         public Int32 RoomNumber { get; set; }
 
-        public bool IsConnected { get; set; }
+        public bool IsRecvWorkerThread { get; set; }
 
         public AsyncSocket ClientSocket;
         SendPacketInfo SendPacket;
         RecvPacketInfo RecvPacket;
-        public TaskActionManager TaskMgr { get; private set; }
+        ManualResetEvent RecvEndCond; 
 
         public Int64 ConnectCount { get; private set; }
 
@@ -32,6 +33,7 @@ namespace NPSBDummyLib
             ClientSocket = new AsyncSocket();
             SendPacket = new SendPacketInfo();
             RecvPacket = new RecvPacketInfo();
+            RecvEndCond = new ManualResetEvent(false);
             SendPacket.Init(DummyManager.GetDummyInfo.PacketSizeMax);
             RecvPacket.Init(DummyManager.GetDummyInfo.PacketSizeMax);
         }
@@ -76,7 +78,8 @@ namespace NPSBDummyLib
                 if (ClientSocket.IsConnected())
                 {
                     currentCount = ClientSocket.Close();
-                    IsConnected = false;
+                    IsRecvWorkerThread = false;
+                    RecvEndCond.Set();
                 }
                 
             }

@@ -135,7 +135,6 @@ namespace NPSBDummyLib
             do
             {
                 var recvResult = await dummy.PopRecvResult(TestConfig.LimitActionTime);
-                //(var errorCode, var packetId, var packetBuffer) = recvResult;
                 var errorCode = recvResult.ResultCode;
                 var packetId = recvResult.PacketId;
                 var packetBuffer = recvResult.BodyBytes;

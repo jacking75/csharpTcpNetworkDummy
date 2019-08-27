@@ -7,10 +7,15 @@ namespace NPSBDummyLib
 {
     class ScenarioRepeatConn : ScenarioBase
     {
+        public override string GetScenarioName()
+        {
+            return "RepeatConnect";
+        }
+
         public override async Task<(bool, string)> TaskAsync(Dummy dummy, TestConfig config)
         {
-            var connect = MakeActionFactory(TestCase.ACTION_CONNECT, config);
-            var disConnect = MakeActionFactory(TestCase.ACTION_DISCONNECT, config);
+            var onlyConnect = MakeActionFactory(TestCase.ACTION_ONLY_CONNECT, config);
+            var onlyDisConnect = MakeActionFactory(TestCase.ACTION_ONLY_DISCONNECT, config);
 
             var repeatCount = 0;
             var testStartTime = DateTime.Now;
@@ -18,19 +23,19 @@ namespace NPSBDummyLib
 
             while (true)
             {
-                taskResult = await connect.Run(dummy);
+                taskResult = await onlyConnect.Run(dummy);
                 if (taskResult.Item1 == false)
                 {
                     // 실패 통보하면서 더미 실행 중지
-                    return (false, "fail Connect");
+                    return (false, taskResult.Item2);
                 }
 
 
-                taskResult = await disConnect.Run(dummy);
+                taskResult = await onlyDisConnect.Run(dummy);
                 if (taskResult.Item1 == false)
                 {
                     // 실패 통보하면서 더미 실행 중지
-                    return (false, "fail DisConnect");
+                    return (false, taskResult.Item2);
                 }
 
                 ++repeatCount;

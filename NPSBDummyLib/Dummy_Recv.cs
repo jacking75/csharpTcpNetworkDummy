@@ -59,21 +59,24 @@ namespace NPSBDummyLib
         public void CreateRecvWorker()
         {
             WorkerThread = Task.Run(async () => {
-                IsConnected = true;
-                while (IsConnected)
+                IsRecvWorkerThread = true;
+                while (IsRecvWorkerThread)
                 {
                     var (recvCount, recvError) = await ClientSocket.ReceiveAsync(RecvPacket.BufferSize, RecvPacket.RecvBuffer);
 
                     var result = await RecvProc(recvCount, recvError);
                     if (!result)
                     {
-                        if (IsConnected)
+                        RecvEndCond.WaitOne();
+                        RecvEndCond.Reset();
+                        
+                        if (IsRecvWorkerThread)
                         {
                             DummyManager.DummyDisConnected();
                             await ConnectAsyncAndReTry(DummyManager.GetDummyInfo.RmoteIP, DummyManager.GetDummyInfo.RemotePort);
                             continue;
                         }
-                       
+                        
                         break;
                     }
                 }
@@ -84,11 +87,11 @@ namespace NPSBDummyLib
         {
             if (recvError != "")
             {
+                RecvEndCond.Set();
                 if (DummyManager.IsInProgress())
                 {
                     var packetObj = ObjectPool<ObjectComponentPacket>.GetInstance.Get();
                     packetObj.ResultCode = EResultCode.RESULT_RECV_ERROR;
-                    packetObj.PacketId = PACKETID.CS_END;
                     await EnqueueResult(packetObj);
                     return false;
                 }
@@ -105,6 +108,7 @@ namespace NPSBDummyLib
             {
                 var packetObj = ObjectPool<ObjectComponentPacket>.GetInstance.Get();
                 packetObj.ResultCode = EResultCode.RESULT_CONNECTION_EXPIRED;
+                packetObj.PacketId = PACKETID.CS_END;
                 await EnqueueResult(packetObj);
                 return false;
             }
