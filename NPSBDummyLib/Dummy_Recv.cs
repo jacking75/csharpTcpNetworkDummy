@@ -88,9 +88,6 @@ namespace NPSBDummyLib
                 RecvEndCond.Set();
                 if (DummyManager.IsInProgress())
                 {
-                    Console.WriteLine($"{recvCount}, {recvError}");
-                    
-
                     await EnqueueResult((EResultCode.RESULT_RECV_ERROR, 0, null));
                     return false;
                 }

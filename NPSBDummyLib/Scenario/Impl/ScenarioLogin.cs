@@ -15,9 +15,9 @@ namespace NPSBDummyLib
         public override async Task<(bool, string)> TaskAsync(Dummy dummy, TestConfig config)
         {
             config.ScenarioName = GetScenarioName();
-            var connect = MakeActionFactory(TestCase.ACTION_CONNECT, config);
-            var disConnect = MakeActionFactory(TestCase.ACTION_DISCONNECT, config);
-            var login = MakeActionFactory(TestCase.ACTION_LOGIN, config);
+            var connect = ActionBase.MakeActionFactory(TestCase.ACTION_CONNECT, config);
+            var disConnect = ActionBase.MakeActionFactory(TestCase.ACTION_DISCONNECT, config);
+            var login = ActionBase.MakeActionFactory(TestCase.ACTION_LOGIN, config);
 
             var repeatCount = 0;
             var testStartTime = DateTime.Now;

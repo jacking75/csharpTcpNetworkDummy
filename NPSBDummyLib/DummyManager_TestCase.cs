@@ -29,45 +29,6 @@ namespace NPSBDummyLib
 
     public partial class DummyManager
     {
-        public ActionBase MakeActionFactory(TestCase testType, TestConfig config)
-        {
-            config.IsConditionFunc = IsInProgress;
-            config.GetDummyFunc = GetDummy;
-
-            ActionBase action = null;
-            switch (testType)
-            {
-                case TestCase.ACTION_CONNECT:
-                    action = new ActionConnect(config);
-                    break;
-
-                case TestCase.ACTION_DISCONNECT:
-                    action = new ActionDisconnect(config);
-                    break;
-
-                case TestCase.ACTION_LOGIN:
-                    action = new ActionLogin(config);
-                    break;
-
-                case TestCase.ACTION_ROOM_ENTER:
-                    action = new ActionRoomEnter(config);
-                    break;
-
-                case TestCase.ACTION_ROOM_LEAVE:
-                    action = new ActionRoomLeave(config);
-                    break;
-
-                case TestCase.ACTION_ROOM_CHAT:
-                    action = new ActionRoomChat(config);
-                    break;
-
-                default:
-                    break;
-            }
-
-            return action;
-        }
-
         public async Task RunAction(Int64 testUniqueId, TestCase testType, TestConfig config)
         {
             var testResults = new List<Task<(bool, string)>>();
@@ -81,7 +42,7 @@ namespace NPSBDummyLib
             {
                 var dummy = DummyList[i];
 
-                var action = MakeActionFactory(testType, config);
+                var action = ActionBase.MakeActionFactory(testType, config);
                 action.Before(dummy);
                 actionList.Add(action);
 
