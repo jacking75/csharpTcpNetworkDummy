@@ -78,7 +78,6 @@ namespace TcpDummyClient
                 LimitActionTime = textBox9.Text.ToInt32(),
                 RoomNumber = textBox2.Text.ToInt32(),
                 ChatMessage = textBox6.Text,
-                MaxVaildActionRecvCount = 3,
             };
 
             return config;

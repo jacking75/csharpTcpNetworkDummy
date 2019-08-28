@@ -197,7 +197,7 @@
             this.textBoxDummyCount.Name = "textBoxDummyCount";
             this.textBoxDummyCount.Size = new System.Drawing.Size(44, 21);
             this.textBoxDummyCount.TabIndex = 6;
-            this.textBoxDummyCount.Text = "10";
+            this.textBoxDummyCount.Text = "100";
             // 
             // label3
             // 
@@ -610,7 +610,7 @@
             this.textBox12.Name = "textBox12";
             this.textBox12.Size = new System.Drawing.Size(44, 21);
             this.textBox12.TabIndex = 12;
-            this.textBox12.Text = "3";
+            this.textBox12.Text = "1";
             // 
             // textBox9
             // 
