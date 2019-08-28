@@ -107,8 +107,7 @@ namespace NPSBDummyLib
 
             try
             {
-                //Client.Close();
-                Client.Client.Disconnect(true);
+                Client.Client.Shutdown(SocketShutdown.Both);
             }
             catch(Exception ex)
             {

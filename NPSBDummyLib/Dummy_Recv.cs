@@ -58,7 +58,6 @@ namespace NPSBDummyLib
         {
             WorkerThread = Task.Run(async () => {
                 IsRecvWorkerThread = true;
-
                 while (IsRecvWorkerThread)
                 {
                     var (recvCount, recvError) = await ClientSocket.ReceiveAsync(RecvPacket.BufferSize, RecvPacket.RecvBuffer);
@@ -68,7 +67,7 @@ namespace NPSBDummyLib
                     {
                         RecvEndCond.WaitOne();
                         RecvEndCond.Reset();
-                        
+
                         if (IsRecvWorkerThread)
                         {
                             DummyManager.DummyDisConnected();
@@ -89,6 +88,9 @@ namespace NPSBDummyLib
                 RecvEndCond.Set();
                 if (DummyManager.IsInProgress())
                 {
+                    Console.WriteLine($"{recvCount}, {recvError}");
+                    
+
                     await EnqueueResult((EResultCode.RESULT_RECV_ERROR, 0, null));
                     return false;
                 }

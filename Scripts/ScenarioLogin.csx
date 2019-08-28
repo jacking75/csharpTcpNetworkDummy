@@ -1,4 +1,4 @@
-#r "../NPSBDummyLib/bin/Release/netstandard2.0/NPSBDummyLib.dll"
+#r "NPSBDummyLib.dll"
 #r "nuget: System.Threading.Channels, 4.5.0"
 #r "nuget: System.Threading.Tasks.Extensions, 4.5.3"
 #r "nuget: MessagePack, 1.7.3"
