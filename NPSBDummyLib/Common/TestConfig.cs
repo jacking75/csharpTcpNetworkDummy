@@ -17,13 +17,13 @@ namespace NPSBDummyLib
         public Int32 ActionRepeatCount;        // 액션 반복 횟수
         public Int32 DummyIntervalTime;        // 더미간 실행 간격(ms)
         public int DummyCount;
-        public int MaxVaildActionRecvCount;    // recv시 유효한 action 최대 수
         public string ChatMessage;             // 채팅 메시지
         public Func<bool> IsConditionFunc;
         public Func<int, Dummy> GetDummyFunc;
 
         public Int64 TestUniqueId;
         public TestCase ActionCase;
+        public string ScenarioName;
 
 
         public bool CheckConfigValue()

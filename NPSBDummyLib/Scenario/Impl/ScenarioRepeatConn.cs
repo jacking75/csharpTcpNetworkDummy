@@ -14,6 +14,7 @@ namespace NPSBDummyLib
 
         public override async Task<(bool, string)> TaskAsync(Dummy dummy, TestConfig config)
         {
+            config.ScenarioName = GetScenarioName();
             var onlyConnect = MakeActionFactory(TestCase.ACTION_ONLY_CONNECT, config);
             var onlyDisConnect = MakeActionFactory(TestCase.ACTION_ONLY_DISCONNECT, config);
 

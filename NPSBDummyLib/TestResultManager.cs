@@ -91,11 +91,15 @@ namespace NPSBDummyLib
                 ResultDic.Remove(testUniqueId);
                 var testTime = DateTime.Now - report.StartTime;
 
+                if (testConfig.ScenarioName != null)
+                {
+                    resultReportList.Add(new ReportData($"[Scenario - {testConfig.ScenarioName}]"));
+                }
+
                 switch (report.Case)
                 {
                     case TestCase.ONLY_CONNECT:
                         {
-                            resultReportList.Add(new ReportData($"[TestCase - {report.Case}]"));
                             resultReportList.Add(new ReportData($"[Test Time - {testTime.TotalMilliseconds} MillSec]"));
                             resultReportList.Add(new ReportData($"DummyCount:{report.DummyCount}, Success:{report.SuccessCount}, Fail:{report.FailCount}", MakeDetailLog(report)));
                         }
@@ -117,7 +121,10 @@ namespace NPSBDummyLib
 
                     default:
                         {
-                            resultReportList.Add(new ReportData($"[TestCase - {report.Case}]"));
+                            if (report.Case != TestCase.NONE)
+                            {
+                                resultReportList.Add(new ReportData($"[TestCase - {report.Case}]"));
+                            }
                             resultReportList.Add(new ReportData($"[Test Time - {testTime.TotalMilliseconds} MillSec]"));
                             resultReportList.Add(new ReportData($"DummyCount:{report.DummyCount}, Success:{report.SuccessCount}, Fail:{report.FailCount}", MakeDetailLog(report)));
                         }

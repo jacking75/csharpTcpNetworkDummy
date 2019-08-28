@@ -14,6 +14,7 @@ namespace NPSBDummyLib
 
         public override async Task<(bool, string)> TaskAsync(Dummy dummy, TestConfig config)
         {
+            config.ScenarioName = GetScenarioName();
             var connect = MakeActionFactory(TestCase.ACTION_CONNECT, config);
             var login = MakeActionFactory(TestCase.ACTION_LOGIN, config);
             var roomEnter = MakeActionFactory(TestCase.ACTION_ROOM_ENTER, config);

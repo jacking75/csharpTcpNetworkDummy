@@ -6,8 +6,6 @@
 
 using NPSBDummyLib;
 
-Console.WriteLine("LOGIN");
-
 var testUniqueIndex = DateTime.Now.Ticks;
 var config = new TestConfig
 {
@@ -17,7 +15,6 @@ var config = new TestConfig
 	LimitActionTime = 90000,
 	RoomNumber = 1,
 	ChatMessage = "ScriptTest",
-	MaxVaildActionRecvCount = 3,
 };
 
 DummyManager.SetDummyInfo = new DummyInfo
