@@ -433,7 +433,7 @@ namespace TcpDummyClient
             await DummyManager.TestLoginAsync(testUniqueIndex, config);
 
             testResultToUILog(testUniqueIndex, config);
-            DummyManager.EndTest();
+            DummyManager.EndTest();   
         }
 
         private async void button17_Click(object sender, EventArgs e)

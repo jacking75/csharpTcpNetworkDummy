@@ -5,6 +5,7 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace NPSBDummyLib
 {
@@ -13,6 +14,8 @@ namespace NPSBDummyLib
         Task WorkerThread;
         Dictionary<PACKETID, int> PacketStatDic = new Dictionary<PACKETID, int>();
         Channel<TaskCompletionSource<(EResultCode, PACKETID, byte[])>> RecvResultChannel = Channel.CreateUnbounded<TaskCompletionSource<(EResultCode, PACKETID, byte[])>>();
+        //ConcurrentQueue<(EResultCode, PACKETID, byte[])> RecvResultChannel = new ConcurrentQueue<(EResultCode, PACKETID, byte[])>();
+
 
         public void IncreasePacket(PACKETID packetId)
         {
@@ -32,7 +35,7 @@ namespace NPSBDummyLib
             PacketStatDic.Clear();
             return result;
         }
-
+        
         public async Task EnqueueResult((EResultCode, PACKETID, byte[]) result)
         {
             var tcs = new TaskCompletionSource<(EResultCode, PACKETID, byte[])>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -54,6 +57,36 @@ namespace NPSBDummyLib
             return resultTask.Task.Result;
         }
         
+/*
+        public void EnqueueResult((EResultCode, PACKETID, byte[]) result)
+        {
+            RecvResultChannel.Enqueue(result);
+            
+        }
+
+        public async Task<(EResultCode, PACKETID, byte[])> PopRecvResult(int limitActionTime, ActionBase action)
+        {
+            DateTime prevTime = DateTime.Now;
+            while (true)
+            {
+                if (RecvResultChannel.TryDequeue(out var result))
+                {
+                    return result;
+                }
+
+                await Task.Delay(100);
+
+                var elapsedTime = DateTime.Now - prevTime;
+                if (elapsedTime.TotalMilliseconds > limitActionTime)
+                {
+                    break;
+                }
+            }
+
+            return (EResultCode.RESULT_FAILED_POP_CHANNEL, 0, null);
+        }
+*/
+
         public void CreateRecvWorker()
         {
             WorkerThread = Task.Run(async () => {

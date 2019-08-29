@@ -32,6 +32,28 @@ namespace NPSBDummyLib
             }
         }
 
+        public (int, string) Receive(int bufferSize, byte[] buffer)
+        {
+            try
+            {
+                var stream = Client.GetStream();
+                var length = stream.Read(buffer, 0, bufferSize);
+                return (length, "");
+                //using (var stream = Client.GetStream())
+                //{
+                //    var length = await stream.ReadAsync(buffer, 0, bufferSize);//.ConfigureAwait(false);
+                //    return (length, "");
+                //}
+            }
+            catch (Exception ex)
+            {
+                LastExceptionMessage = ex.Message;
+                Client.Close();
+                return (-1, ex.Message);
+            }
+        }
+
+
         public async Task<(int, string)> ReceiveAsync(int bufferSize, byte[] buffer)
         {
             try

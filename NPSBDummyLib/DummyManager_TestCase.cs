@@ -130,7 +130,10 @@ namespace NPSBDummyLib
             for (int i = 0; i < DummyList.Count; ++i)
             {
                 var dummy = DummyList[i];
-                testResults.Add(func(dummy, startTime));
+                testResults.Add(Task<(bool, string)>.Run(async () =>
+                {
+                    return await func(dummy, startTime);
+                }));
             }
 
             await Task.WhenAll(testResults.ToArray());
