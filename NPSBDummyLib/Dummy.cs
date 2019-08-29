@@ -16,7 +16,6 @@ namespace NPSBDummyLib
         public AsyncSocket ClientSocket;
         SendPacketInfo SendPacket;
         RecvPacketInfo RecvPacket;
-        ManualResetEvent RecvEndCond; 
 
         public Int64 ConnectCount { get; private set; }
 
@@ -33,7 +32,6 @@ namespace NPSBDummyLib
             ClientSocket = new AsyncSocket();
             SendPacket = new SendPacketInfo();
             RecvPacket = new RecvPacketInfo();
-            RecvEndCond = new ManualResetEvent(false);
             SendPacket.Init(DummyManager.GetDummyInfo.PacketSizeMax);
             RecvPacket.Init(DummyManager.GetDummyInfo.PacketSizeMax);
         }
@@ -79,7 +77,6 @@ namespace NPSBDummyLib
                 {
                     currentCount = ClientSocket.Close();
                     IsRecvWorkerThread = false;
-                    RecvEndCond.Set();
                 }
                 
             }

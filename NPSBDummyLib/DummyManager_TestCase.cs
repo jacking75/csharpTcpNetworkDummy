@@ -120,6 +120,25 @@ namespace NPSBDummyLib
             TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList, startTime);
         }
 
+        public async Task RunTestScenario(Int64 testUniqueId, TestConfig config, Func<Dummy, DateTime, Task<(bool, string)>> func)
+        {
+            var startTime = DateTime.Now;
+
+            SetConfigure(config);
+            var testResults = new List<Task<(bool, string)>>();
+
+            for (int i = 0; i < DummyList.Count; ++i)
+            {
+                var dummy = DummyList[i];
+                testResults.Add(func(dummy, startTime));
+            }
+
+            await Task.WhenAll(testResults.ToArray());
+
+            TestResultMgr.AddTestResult(testUniqueId, Config.ActionCase, DummyList, startTime, testResults);
+        }
+
+
         async Task RunTestScenario(Int64 testUniqueId, TestConfig config, List<Dummy> dummyList, Action<List<Task<(bool, string)>>, Dummy, Int64, TestConfig> scenarioTask)
         {
             var startTime = DateTime.Now;

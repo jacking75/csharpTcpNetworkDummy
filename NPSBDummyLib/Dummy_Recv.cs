@@ -64,17 +64,7 @@ namespace NPSBDummyLib
 
                     var result = await RecvProc(recvCount, recvError);
                     if (!result)
-                    {
-                        RecvEndCond.WaitOne();
-                        RecvEndCond.Reset();
-
-                        if (IsRecvWorkerThread)
-                        {
-                            DummyManager.DummyDisConnected();
-                            await ConnectAsyncAndReTry(DummyManager.GetDummyInfo.RmoteIP, DummyManager.GetDummyInfo.RemotePort);
-                            continue;
-                        }
-                        
+                    {                        
                         break;
                     }
                 }
@@ -85,7 +75,6 @@ namespace NPSBDummyLib
         {
             if (recvError != "")
             {
-                RecvEndCond.Set();
                 if (DummyManager.IsInProgress())
                 {
                     await EnqueueResult((EResultCode.RESULT_RECV_ERROR, 0, null));
