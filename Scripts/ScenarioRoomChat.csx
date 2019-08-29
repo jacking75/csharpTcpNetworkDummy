@@ -107,7 +107,7 @@ Func<Dummy, DateTime, Task<(bool, string)>> func = async (dummy, testStartTime) 
 };
 
 var et = DateTime.Now - prevTime;
-Console.WriteLine($"{et} - Prepare Time");
+Console.WriteLine($"{et.TotalMilliseconds} - Prepare Time");
 
 await DummyManager.RunTestScenario(testUniqueIndex, config, func);
 var testResult = DummyManager.GetTestResult(testUniqueIndex, config);

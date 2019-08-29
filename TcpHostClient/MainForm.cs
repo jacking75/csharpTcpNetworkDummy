@@ -425,6 +425,7 @@ namespace TcpDummyClient
         private async void button16_Click(object sender, EventArgs e)
         {
             var testUniqueIndex = DateTime.Now.Ticks;
+
             var config = GetTestBaseConfig();
             DummyManager.SetDummyInfo = GetBaseDummyInfo();
             DummyManager.Init();

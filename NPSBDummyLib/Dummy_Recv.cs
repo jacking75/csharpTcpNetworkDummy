@@ -132,6 +132,12 @@ namespace NPSBDummyLib
 
             while (recvCount >= (packetSize = BitConverter.ToInt16(RecvPacket.RecvBuffer, 0)))
             {
+                if (packetSize > DummyManager.GetDummyInfo.PacketSizeMax - PacketDef.PACKET_HEADER_SIZE)
+                {
+                    await EnqueueResult((EResultCode.RESULT_EXCEED_PACKET_SIZE, 0, null));
+                    return false;
+                }
+
                 var packetId = (PACKETID)BitConverter.ToInt16(RecvPacket.RecvBuffer, 2);
                 var body = PacketToBytes.SplitPacketBuffer(recvCount, RecvPacket);
                 await EnqueueResult((EResultCode.RESULT_OK, packetId, body));

@@ -122,8 +122,6 @@
             // checkBox2
             // 
             this.checkBox2.AutoSize = true;
-            this.checkBox2.Checked = true;
-            this.checkBox2.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox2.Location = new System.Drawing.Point(7, 85);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(108, 16);
@@ -137,7 +135,7 @@
             this.textBox13.Name = "textBox13";
             this.textBox13.Size = new System.Drawing.Size(40, 21);
             this.textBox13.TabIndex = 12;
-            this.textBox13.Text = "1400";
+            this.textBox13.Text = "5000";
             // 
             // label12
             // 
@@ -197,7 +195,7 @@
             this.textBoxDummyCount.Name = "textBoxDummyCount";
             this.textBoxDummyCount.Size = new System.Drawing.Size(44, 21);
             this.textBoxDummyCount.TabIndex = 6;
-            this.textBoxDummyCount.Text = "100";
+            this.textBoxDummyCount.Text = "400";
             // 
             // label3
             // 
