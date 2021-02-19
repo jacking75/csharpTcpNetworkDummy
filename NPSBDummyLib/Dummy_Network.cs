@@ -23,7 +23,7 @@ namespace NPSBDummyLib
 
         public async Task<(bool Result, int ErrorCode, string ErrorStr)> ConnectAsyncAndReTry()
         {
-            return await ConnectAsyncAndReTry(DummyManager.Config.RmoteIP, DummyManager.Config.RemotePort);
+            return await ConnectAsyncAndReTry(DummyManager.Config.RemoteIP, DummyManager.Config.RemotePort);
         }
         public async Task<(bool Result, int ErrorCode, string ErrorStr)> ConnectAsyncAndReTry(string ip, int port)
         {

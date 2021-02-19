@@ -102,7 +102,7 @@ namespace TcpDummyClient
                 EchoPacketSizeMin = textBox10.Text.ToInt32(),
                 EchoPacketSizeMax = textBox11.Text.ToInt32(),
 
-                RmoteIP = textBoxIP.Text,
+                RemoteIP = textBoxIP.Text,
                 RemotePort = textBoxPort.Text.ToInt32(),
                 PacketSizeMax = textBoxMaxPacketSize.Text.ToInt32(),
             };
@@ -110,6 +110,11 @@ namespace TcpDummyClient
             if(config.MaxRepeatTimeSec > 0)
             {
                 config.MaxRepeatCount = 0;
+            }
+
+            if (checkBox1.Checked)
+            {
+                config.RemoteIP = "127.0.0.1";
             }
 
             return config;

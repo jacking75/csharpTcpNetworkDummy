@@ -21,7 +21,7 @@ namespace NPSBDummyLib
         public int EchoPacketSizeMax;
                 
         // 네트워크 정보
-        public string RmoteIP;
+        public string RemoteIP;
         public int RemotePort;
         public int PacketSizeMax;
 

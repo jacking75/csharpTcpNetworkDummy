@@ -69,7 +69,7 @@ namespace NPSBDummyLib
         {
             try
             {
-                Conn.Send(buffer);
+                Conn.Send(buffer, bufferSize, SocketFlags.None);
                 return "";
             }
             catch (Exception ex)
