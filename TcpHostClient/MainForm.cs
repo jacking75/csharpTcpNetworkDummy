@@ -7,6 +7,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ using System.Windows.Forms;
 
 namespace TcpDummyClient
 {
+    [SupportedOSPlatform("windows10.0.177630")]
     public partial class MainForm : Form
     {
         NPSBDummyLib.ScenarioRunner DummyScenarioRunner = new NPSBDummyLib.ScenarioRunner();
@@ -24,8 +26,8 @@ namespace TcpDummyClient
 
         System.Collections.Concurrent.ConcurrentQueue<string> logMsgQueue;
 
-        System.Windows.Threading.DispatcherTimer dispatcherUITimer;
-        System.Windows.Threading.DispatcherTimer dispatcherLogTimer;
+        System.Windows.Forms.Timer dispatcherUITimer;
+        System.Windows.Forms.Timer dispatcherLogTimer;
 
 
         public MainForm()
@@ -41,14 +43,14 @@ namespace TcpDummyClient
             DummyMgr.LogFunc = AddLog;
             logMsgQueue = new System.Collections.Concurrent.ConcurrentQueue<string>();
 
-            dispatcherUITimer = new System.Windows.Threading.DispatcherTimer();
+            dispatcherUITimer = new System.Windows.Forms.Timer();
             dispatcherUITimer.Tick += new EventHandler(UpdateUI);
-            dispatcherUITimer.Interval = new TimeSpan(0, 0, 0, 1);
+            dispatcherUITimer.Interval = 100;
             dispatcherUITimer.Start();
 
-            dispatcherLogTimer = new System.Windows.Threading.DispatcherTimer();
+            dispatcherLogTimer = new System.Windows.Forms.Timer();
             dispatcherLogTimer.Tick += new EventHandler(UpdateLogPrint);
-            dispatcherLogTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+            dispatcherLogTimer.Interval = 100;
             dispatcherLogTimer.Start();
         }
 

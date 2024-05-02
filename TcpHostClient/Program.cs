@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
 
 namespace TcpDummyClient
 {
+    [SupportedOSPlatform("windows10.0.177630")]
     static class Program
     {
         /// <summary>

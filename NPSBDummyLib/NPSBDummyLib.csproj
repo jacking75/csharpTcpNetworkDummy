@@ -1,13 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="Action\**" />
     <Compile Remove="Dummys\**" />
@@ -22,7 +19,6 @@
     <None Remove="Scenario\Impl\**" />
     <None Remove="TestCase\**" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Remove="DummyManager_TestCase.cs" />
     <Compile Remove="Dummy\ConnectOnly.cs" />
@@ -33,15 +29,10 @@
     <Compile Remove="Scenario\ScenarioBase.cs" />
     <Compile Remove="TestResultManager.cs" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Dotnet.Script.Core" Version="1.0.1" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="1.7.0" />
-    <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Channels" Version="5.0.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="Dotnet.Script.Core" Version="1.5.0" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.10" />
     <PackageReference Include="Utf8Json" Version="1.3.7" />
+    <PackageReference Include="System.Threading.Channels" Version="8.0.0" />
   </ItemGroup>
-
 </Project>

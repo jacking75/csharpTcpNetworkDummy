@@ -1,9 +1,9 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpDummyClient", "TcpDummyClient.csproj", "{06B65703-5972-46BD-AD94-EA783B92A3E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpDummyClient", "TcpDummyClient.csproj", "{06B65703-5972-46BD-AD94-EA783B92A3E3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPSBDummyLib", "..\NPSBDummyLib\NPSBDummyLib.csproj", "{EBEE69EA-84CB-4171-83EA-F764F4606B6C}"
 EndProject
